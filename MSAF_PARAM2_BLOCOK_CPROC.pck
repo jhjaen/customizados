@@ -358,9 +358,13 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
 
 
      if (pCarregaCsvParam = 'S' and pDirectory is not null) THEN -- carga de parametros (contas detentoras e contrapartidas)
-
-     EXECUTE IMMEDIATE 'alter session set nls_numeric_characters = '',.''';
-     EXECUTE IMMEDIATE 'alter session set nls_date_format = ''dd/mm/yyyy''';
+       Begin
+         EXECUTE IMMEDIATE 'alter session set nls_numeric_characters = '',.''';
+         EXECUTE IMMEDIATE 'alter session set nls_date_format = ''dd/mm/yyyy''';
+         exception
+           when others then
+             lib_proc.add_log('Falha ao alterar sessao para nls_numeric e data_format '||SQLERRM,1);
+       end;
 
       for i IN pFiles.FIRST..pFiles.LAST  LOOP
 

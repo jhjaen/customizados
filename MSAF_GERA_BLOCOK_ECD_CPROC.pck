@@ -396,11 +396,16 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
         lib_proc.CLOSE;
         RETURN mproc_id;
       end if;
+      
+      begin
+        execute immediate 'truncate table MSAF_SALDO_DETALHADO_K';
+        execute immediate 'truncate table MSAF_BLOCOK_ELIMINACAO';
 
-     execute immediate 'truncate table MSAF_SALDO_DETALHADO_K';
-     execute immediate 'truncate table MSAF_BLOCOK_ELIMINACAO';
-
-     EXECUTE IMMEDIATE 'alter session set nls_numeric_characters = '',.''';
+        EXECUTE IMMEDIATE 'alter session set nls_numeric_characters = '',.''';
+        exception
+          when others then
+            lib_proc.add_log('Erro inesperado ao truncar tabelas e alterar sessao: '||SQLERRM,1);
+      end;
 
      -- GRAVA SALDOS DETALHADOS
      for reg1 in C1(last_day(pPeriodo)) loop

@@ -457,7 +457,12 @@ CREATE OR REPLACE PACKAGE BODY PCK_BRAS_GERA_NF_CPROC IS
     vDatIni      date;
     vDatFim      date;
   BEGIN
-    execute immediate 'alter session set NLS_LANGUAGE = ''PORTUGUESE''';
+    BEGIN
+      execute immediate 'alter session set NLS_LANGUAGE = ''PORTUGUESE''';
+      exception
+           when others then
+             lib_proc.add_log('Falha ao alterar sessao NLS_LANGUAGE para PORTUGUESE: '||SQLERRM,1);
+    end;
     
     if pPeriD = 1 then -- mensal
       select a.descricao,

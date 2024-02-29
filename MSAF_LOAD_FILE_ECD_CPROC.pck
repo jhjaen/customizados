@@ -388,8 +388,12 @@ CREATE OR REPLACE PACKAGE BODY MSAF_LOAD_FILE_ECD_CPROC IS
                 MONTA_LINHA('style="vertical-align: top; font-weight: bold; text-align: center; color: #85929E; font-size: 16px;"> '||vs_msg || '<br>',vn_rel);
                 MONTA_LINHA('</td>',vn_rel);
 
-
-               execute immediate 'truncate table treg_plano_contas_ecd';
+                begin
+                  execute immediate 'truncate table treg_plano_contas_ecd';
+                  exception
+                    when others then
+                      lib_proc.add_log('Falha ao truncar tabela treg_plano_contas_ecd: '||SQLERRM,1);
+                end;
 
               for i IN pFiles.FIRST..pFiles.LAST loop
                  -- chamar procedure
