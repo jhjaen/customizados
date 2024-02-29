@@ -328,14 +328,14 @@ CREATE OR REPLACE PACKAGE BODY MSAF_LOAD_FILE_ECD_CPROC IS
     vs_processo       varchar2(100);
     vs_msg            varchar2(200):=null;
 
-    v_finalizar       number := 0;
+    --v_finalizar       number := 0;
 
-    Status_w         INTEGER;
-    RazaoEst_w       ESTABELECIMENTO.RAZAO_SOCIAL%TYPE;
-    CGC_w            ESTABELECIMENTO.CGC%TYPE;
+    --Status_w         INTEGER;
+    --RazaoEst_w       ESTABELECIMENTO.RAZAO_SOCIAL%TYPE;
+    --CGC_w            ESTABELECIMENTO.CGC%TYPE;
     linha_log       varchar2(100);
 
-    Finalizar EXCEPTION;
+    --Finalizar EXCEPTION;
     
     vs_ind_saldo_fim varchar2(1);
     vs_saldo_fim     varchar2(19);
@@ -594,12 +594,16 @@ CREATE OR REPLACE PACKAGE BODY MSAF_LOAD_FILE_ECD_CPROC IS
              end loop;
 
 
-              LIB_PROC.add_log(mproc_id || '  Processo ', 1);
-              LIB_PROC.CLOSE();
-
-        RETURN mproc_id;
+              --LIB_PROC.add_log(mproc_id || '  Processo ', 1);
+              --LIB_PROC.CLOSE();
+              --RETURN mproc_id;
 
         END;
+
+      LIB_PROC.add_log(mproc_id || '  Processo ', 1);
+      LIB_PROC.CLOSE();
+      RETURN mproc_id;
+
     END;
 
 

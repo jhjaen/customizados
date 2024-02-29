@@ -56,15 +56,15 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
 
   v_linha         varchar2(32767) := '';
   v_arquivo       utl_file.file_type;
-  wDelimiter      char(1) := ';';
-  v_commit        number :=0;
-  v_error         varchar2(255) := null;
+  wDelimiter      varchar2(1) := ';';
+  --v_commit        number :=0;
+  --v_error         varchar2(255) := null;
 
-  t_x262          sped_contas_emp_cons%rowtype := null;
-  t_sx262         safx262%rowtype := null;
+  --t_x262          sped_contas_emp_cons%rowtype := null;
+  --t_sx262         safx262%rowtype := null;
 
   v_num           number :=0;
-  v_qtde_reg      number :=0;
+  --v_qtde_reg      number :=0;
 
   FUNCTION f_get_string ( p_string         VARCHAR2
                          , p_posicao       PLS_INTEGER
@@ -289,25 +289,25 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
 
     -- Variaveis de Trabalho */
     mproc_id          INTEGER;
-    vn_rel            number:=1;
-    vs_nome_interface varchar2(300);
-    vs_nome_rel       varchar2(3000);
-    vs_processo       varchar2(100);
-    vs_msg            varchar2(200):=null;
+    --vn_rel            number:=1;
+    --vs_nome_interface varchar2(300);
+    --vs_nome_rel       varchar2(3000);
+    --vs_processo       varchar2(100);
+    --vs_msg            varchar2(200):=null;
 
-    v_data_ini        varchar2(8) := null;
-    v_data_fim        varchar2(8) := null;
+    --v_data_ini        varchar2(8) := null;
+    --v_data_fim        varchar2(8) := null;
 
-    v_grupo           sped_contas_emp_cons.grupo_conta%TYPE;
+    --v_grupo           sped_contas_emp_cons.grupo_conta%TYPE;
 
-    v_finalizar       number := 0;
+    --v_finalizar       number := 0;
 
-    Status_w         INTEGER;
-    RazaoEst_w       ESTABELECIMENTO.RAZAO_SOCIAL%TYPE;
-    CGC_w            ESTABELECIMENTO.CGC%TYPE;
+    --Status_w         INTEGER;
+    --RazaoEst_w       ESTABELECIMENTO.RAZAO_SOCIAL%TYPE;
+    --CGC_w            ESTABELECIMENTO.CGC%TYPE;
     linha_log       varchar2(100);
 
-    Finalizar EXCEPTION;
+    --Finalizar EXCEPTION;
     exSelecao EXCEPTION;
 
     rParam_ecd      msaf_param_blocok_ecd%ROWTYPE;

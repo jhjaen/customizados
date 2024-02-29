@@ -307,16 +307,16 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
     -- Variaveis de Trabalho */
     mproc_id          INTEGER;
     mLinha            VARCHAR2(1000);
-    v                 char(1) := ';';
+    v                 varchar2(1) := ';';
     v_vlr_elimin      number(17,2) :=0;
-    v_ind_dc_elimn    varchar(1) := 0;
-    v_cod_conta_det   varchar2(70) :=null;
+    --v_ind_dc_elimn    varchar2(1) := 0;
+    --v_cod_conta_det   varchar2(70) :=null;
     v_vlr_consolid    number(17,2) :=0;
-    v_ind_dc1         char(1) := null;
-    v_ind_dc2         char(1) := null;
-    v_ind_dc3         char(1) := null;
+    v_ind_dc1         varchar2(1) := null;
+    --v_ind_dc2         varchar2(1) := null;
+    --v_ind_dc3         varchar2(1) := null;
 
-    v_cod_emp_cons   varchar2(3) := null;
+    --v_cod_emp_cons   varchar2(3) := null;
 
 
     t_safx242 safx242%rowtype;
@@ -327,20 +327,20 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
 
     v_finalizar number := 0;
 
-    Status_w        INTEGER;
+    --Status_w        INTEGER;
     RazaoEmp_w      EMPRESA.RAZAO_SOCIAL%TYPE;
     RazaoEst_w      ESTABELECIMENTO.RAZAO_SOCIAL%TYPE;
     CGC_w           ESTABELECIMENTO.CGC%TYPE;
-    Ind_Atividade_w ESTABELECIMENTO.Ind_Atividade%type;
-    IndConvIcms_w   ESTABELECIMENTO.IND_CONV_ICMS%TYPE;
-    CodAtividade_w  ESTABELECIMENTO.COD_ATIVIDADE%TYPE;
-    UF_estab_w      ESTADO.COD_ESTADO%TYPE;
+    --Ind_Atividade_w ESTABELECIMENTO.Ind_Atividade%type;
+    --IndConvIcms_w   ESTABELECIMENTO.IND_CONV_ICMS%TYPE;
+    --CodAtividade_w  ESTABELECIMENTO.COD_ATIVIDADE%TYPE;
+    --UF_estab_w      ESTADO.COD_ESTADO%TYPE;
     linha_log       varchar2(100);
 
     reg_partida        msaf_blocok_eliminacao%ROWTYPE;
     reg_contrapartida  msaf_blocok_eliminacao%ROWTYPE;
 
-    Finalizar EXCEPTION;
+    --Finalizar EXCEPTION;
 
   BEGIN
 

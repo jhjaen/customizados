@@ -330,35 +330,35 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
 
     -- Variaveis de Trabalho */
     mproc_id          INTEGER;
-    mLinha            VARCHAR2(1000);
-    v_tipo            varchar2(100);
+    --mLinha            VARCHAR2(1000);
+    --v_tipo            varchar2(100);
     mcod_empresa      varchar2(100); --empresa.cod_empresa%type;
-    v_result          varchar2(10) := null;
-    v_rowid           varchar2(50) := null;
+    --v_result          varchar2(10) := null;
+    v_rowid           varchar2(50);
     vn_rel            number:=1;
     vs_nome_interface varchar2(300);
     vs_nome_rel       varchar2(3000);
     vs_processo       varchar2(100);
     v_count           number:=0;
-    vs_msg            varchar2(200):=null;
-    v_ind_ext         char(1) := null;
-    v_movto           char(1) :=null;
+    vs_msg            varchar2(200);
+    --v_ind_ext         varchar2(1) := null;
+    --v_movto           varchar2(1) :=null;
 
     vVlrElimin        number :=0;
 
     v_finalizar       number := 0;
 
-    Status_w         INTEGER;
+    --Status_w         INTEGER;
     RazaoEmp_w       EMPRESA.RAZAO_SOCIAL%TYPE;
     RazaoEst_w       ESTABELECIMENTO.RAZAO_SOCIAL%TYPE;
     CGC_w            ESTABELECIMENTO.CGC%TYPE;
-    Ind_Atividade_w  ESTABELECIMENTO.Ind_Atividade%type;
-    IndConvIcms_w    ESTABELECIMENTO.IND_CONV_ICMS%TYPE;
-    CodAtividade_w   ESTABELECIMENTO.COD_ATIVIDADE%TYPE;
-    UF_estab_w       ESTADO.COD_ESTADO%TYPE;
+    --Ind_Atividade_w  ESTABELECIMENTO.Ind_Atividade%type;
+    --IndConvIcms_w    ESTABELECIMENTO.IND_CONV_ICMS%TYPE;
+    --CodAtividade_w   ESTABELECIMENTO.COD_ATIVIDADE%TYPE;
+    --UF_estab_w       ESTADO.COD_ESTADO%TYPE;
     linha_log       varchar2(100);
 
-    Finalizar EXCEPTION;
+    --Finalizar EXCEPTION;
 
 
   BEGIN

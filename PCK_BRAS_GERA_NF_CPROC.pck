@@ -7,8 +7,8 @@ CREATE OR REPLACE PACKAGE PCK_BRAS_GERA_NF_CPROC IS
   function versao return varchar2;
   FUNCTION Executar(pCodestab     x07_docto_fiscal.cod_estab%type, --02 Estabelecimento
                     pAno           varchar2, --03 Ano de apura��o
-                    pPeriD         char, --04 Periodicidade
-                    pPeriodo       char, --05 Per�odo
+                    pPeriD         varchar2, --04 Periodicidade
+                    pPeriodo       varchar2, --05 Per�odo
                     pTipoGear      number,
                     pNumDocFis    x07_docto_fiscal.num_docfis%type,
                     pNumDocFisIni x07_docto_fiscal.num_docfis%type,
@@ -441,8 +441,8 @@ CREATE OR REPLACE PACKAGE BODY PCK_BRAS_GERA_NF_CPROC IS
 
   FUNCTION Executar(pCodestab     x07_docto_fiscal.cod_estab%type, --02 Estabelecimento
                     pAno           varchar2, --03 Ano de apura��o
-                    pPeriD         char, --04 Periodicidade
-                    pPeriodo       char, --05 Per�odo
+                    pPeriD         varchar2, --04 Periodicidade
+                    pPeriodo       varchar2, --05 Per�odo
                     pTipoGear      number,
                     pNumDocFis    x07_docto_fiscal.num_docfis%type,
                     pNumDocFisIni x07_docto_fiscal.num_docfis%type,
