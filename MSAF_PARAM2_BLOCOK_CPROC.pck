@@ -529,6 +529,11 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
                 RETURN mproc_id;
 
         END;
+        
+      LIB_PROC.add_log(mproc_id || '  Processo ', 1);
+      LIB_PROC.CLOSE();
+
+      RETURN mproc_id;
 
     END;
 

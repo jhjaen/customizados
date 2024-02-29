@@ -108,8 +108,8 @@ CREATE OR REPLACE PACKAGE BODY MSAF_DIM_SLS_CPROC is
 		LIB_PROC.add_tipo(mproc_id, 1, 'ARQ_DIM', 2);
 
 		DECLARE
--- Inicio Cr01
-   -- notas fiscais de servi�os emitidas
+        -- Inicio Cr01
+        -- notas fiscais de servi�os emitidas
 	  CURSOR rel_serv_saida(ccd_empresa VARCHAR2,
                         ccd_estab VARCHAR2,
                         cdt_inicio DATE,
@@ -160,11 +160,11 @@ CREATE OR REPLACE PACKAGE BODY MSAF_DIM_SLS_CPROC is
                    x04.cep,
                    x04.cod_atividade,
                    dwt07.situacao
--- Fim Cr01
+                -- Fim Cr01
 
 
--- In�cio Cr02
-   -- notas fiscais de servi�os recebidas
+                    -- In�cio Cr02
+               -- notas fiscais de servi�os recebidas
    CURSOR rel_serv_ent(ccd_empresa VARCHAR2,
                        ccd_estab VARCHAR2,
                        cdt_inicio DATE,
@@ -215,7 +215,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_DIM_SLS_CPROC is
                    upper(x04.cidade),
                    decode(x04.cod_pais,'105',upper(uf.cod_estado),'EX'),
                    x04.cep;
--- Fim Cr02
+                 -- Fim Cr02
 
 		BEGIN
 

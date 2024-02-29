@@ -402,7 +402,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
 
      EXECUTE IMMEDIATE 'alter session set nls_numeric_characters = '',.''';
 
--- GRAVA SALDOS DETALHADOS
+     -- GRAVA SALDOS DETALHADOS
      for reg1 in C1(last_day(pPeriodo)) loop
 
           v_vlr_elimin :=0;
@@ -435,66 +435,14 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
       commit;
 
       -- GRAVA AS ELIMINACOES
--- 002 Inicio (Alteracao na composicao das eliminacoes)
--- A composicao das eliminacoes ser� feita em 3 etapas (Eliminacoes informadas manualmente, Eliminacoes atraves da conta consolidadora, Eliminacoes atraves da conta analitica)
+      -- 002 Inicio (Alteracao na composicao das eliminacoes)
+      -- A composicao das eliminacoes ser� feita em 3 etapas (Eliminacoes informadas manualmente, Eliminacoes atraves da conta consolidadora, Eliminacoes atraves da conta analitica)
 
-/*
-      for reg1 in (select a.cod_empresa,
-                           a.data_saldo_cons,
-                           b.cod_conta_det,
-                           d.cod_emp_part,
-                           b.cod_conta_contr_part,
-                           decode(sign(sum(nvl(a.vlr_saldo_fim, 0))), -1, 'C', 'D') ind_deb_cred,
-                           sum(nvl(a.vlr_saldo_fim, 0)) vlr_eliminacao
-                      from MSAF_SALDO_DETALHADO_K a,
-                           MSAF_PARAM_BLOCOK_ECD  b,
-                           estabelecimento        c,
-                           x240_inf_empresa_cons  d
-                     where 1 = 1
-                       and a.cod_empresa = b.cod_empresa_cons
-                       and a.data_saldo_cons = last_day(pPeriodo)
-                       and a.cod_conta = b.cod_conta_contr_part
-                       and a.cod_empresa = c.cod_empresa
-                       and a.cod_estab = c.cod_estab
-                       and a.cod_emp_part not in
-                           (select k.cod_emp_part
-                              from x240_inf_empresa_cons k
-                             where k.cnpj = c.cgc
-                               and k.data_fim_cons = last_day(pPeriodo)
-                               and k.cod_empresa = Pcod_empresa)
-                       and a.cod_empresa = Pcod_empresa
-                       and a.data_saldo_cons = last_day(pPeriodo)
-                       and a.cod_empresa = d.cod_empresa
-                       and a.cod_emp_part = d.cod_emp_part
-                       and a.data_saldo_cons = d.data_fim_cons
-                       and exists (select 1
-                                   from MSAF_SALDO_DETALHADO_K z
-                                   where z.cod_conta = b.cod_conta_det)
-                     group by a.cod_empresa,
-                              b.cod_conta_det,
-                              a.data_saldo_cons,
-                              d.cod_emp_part,
-                              b.cod_conta_contr_part) loop
-
-
-
-             begin
-               insert into MSAF_BLOCOK_ELIMINACAO values reg1;
-             exception
-               when others then
-                 null;
-             end;
-
-      end loop;
-
-      COMMIT;
-*/
-
--- 003
--- 27/04/2023
--- DO LOOP ABAIXO, MANTER APENAS O CURSOR DE ELEIMINACOES MANUAIS
--- AINDA NO LOOP, MANTER A INSERCAO DA CONTRAPARTIDA
--- FORA DO LOOP, INCLUIR A NOVA REGRA DE COMPOSICAO DE SALDOS
+      -- 003
+      -- 27/04/2023
+      -- DO LOOP ABAIXO, MANTER APENAS O CURSOR DE ELEIMINACOES MANUAIS
+      -- AINDA NO LOOP, MANTER A INSERCAO DA CONTRAPARTIDA
+      -- FORA DO LOOP, INCLUIR A NOVA REGRA DE COMPOSICAO DE SALDOS
 
 
       FOR reg IN (-- cursor para eliminacoes manuais (considera o valor informado manualmente na parametrizacao)
@@ -516,74 +464,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
                        WHERE 1=1
                        AND   param.cod_empresa_cons = Pcod_empresa
                        AND   param.Periodo          = last_day(pPeriodo)
-                       AND   NVL(param.vlr_eliminacao,0) >0
-/*
-                  UNION -- cursor para contas consolidadoras sem eliminacao parametrizada (busca saldo final da consolidadoras)
-
-                  SELECT param.cod_empresa_cons                AS cod_empresa
-                         , param.periodo                       AS data_saldo
-                         , param.cod_empresa_det               AS cod_empresa_det
-                         , param.Cod_Conta_Det                 AS cod_conta_det
-                         , param.cod_empresa_contra            AS cod_empresa_contr
-                         , param.Cod_Conta_Contra              AS cod_conta_cont
-                         , DECODE(SIGN(saldo.vlr_saldo_fim),
-                                  -1,'D','C')                  AS ind_deb_cre
-                         , saldo.vlr_saldo_fim                 AS vlr_eliminacao
-
-                       FROM  MSAF_PARAM_BLOCOK_ECD PARAM, MSAF_SALDO_DETALHADO_K SALDO
-                       WHERE 1=1
---                       AND   PARAM.COD_EMPRESA_DET  = saldo.cod_emp_part
---                       AND   PARAM.COD_CONTA_DET    = saldo.cod_conta
-
-                       AND   param.Cod_Empresa_Contra = saldo.cod_emp_part
-                       AND   PARAM.COD_CONTA_CONTRA = saldo.cod_conta
-                       --AND   PARAM.COD_CONTA_DET    = saldo.cod_conta
-
-                       AND   param.cod_empresa_cons = Pcod_empresa
-                       AND   param.Periodo          = last_day(pPeriodo)
-                       AND   NVL(param.vlr_eliminacao,0) = 0
-*/
-                /*UNION -- cursor para contas analiticas sem eliminacao parametrizada (totaliza saldo final das analiticas)
-
-                  SELECT param.cod_empresa_cons                AS cod_empresa
-                         , param.periodo                       AS data_saldo
-                         , param.cod_empresa_det               AS cod_empresa_det
-                         , param.Cod_Conta_Det                 AS cod_conta_det
-                         , param.cod_empresa_contra            AS cod_empresa_contr
-                         , cons.cod_conta_cons                 AS cod_conta_cont
-
-                         , DECODE(SIGN(SUM(DECODE(saldo.ind_dc_fim,'C',saldo.vlr_saldo_fim*-1,saldo.vlr_saldo_fim))),-1,'C','D')   AS ind_deb_cre
-                         , SUM(DECODE(saldo.ind_dc_fim,'C',saldo.vlr_saldo_fim*-1,saldo.vlr_saldo_fim)) AS vlr_eliminacao
-
-                       FROM  MSAF_PARAM_BLOCOK_ECD PARAM, X240_INF_EMPRESA_CONS X240, TREG_SALDO_ECD SALDO, SPED_CONTAS_EMP_CONS CONS
-                       WHERE 1=1
-                       AND   param.Cod_Empresa_Contra = x240.cod_emp_part
-
-                       AND   x240.cnpj                = saldo.cnpj
-                       AND   param.cod_conta_contra   = saldo.cod_conta
-                       AND   param.Periodo            = saldo.periodo
-
-                       AND   x240.cod_emp_part        = cons.cod_emp_part
-                       AND   param.Periodo            BETWEEN cons.data_ini_cons AND cons.data_fim_cons
-                       AND   saldo.cod_conta          = cons.cod_conta
-
-                       AND   NVL(saldo.vlr_saldo_fim,0) > 0
-
-                       AND   param.cod_empresa_cons = Pcod_empresa
-                       AND   param.Periodo          = last_day(pPeriodo)
-                       and   X240.Data_Fim_Cons     = last_day(pPeriodo)
-
-                       AND   NVL(param.vlr_eliminacao,0) = 0
-
-
-                       GROUP BY cod_empresa_cons
-                                , param.periodo
-                                , param.cod_empresa_det
-                                , param.Cod_Conta_Det
-                                , param.cod_empresa_contra
-                                , cons.cod_conta_cons
-
-                  */)
+                       AND   NVL(param.vlr_eliminacao,0) >0)
                   LOOP
 
                  BEGIN
@@ -615,90 +496,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
 
                   COMMIT;
 
--- Inclusao ajuste 003
-
-
-            /*begin
-            
-             FOR CALC IN (SELECT PARAM.COD_EMPRESA_CONS       AS COD_EMPRESA_CONS
-                                 , PARAM.PERIODO              AS DATA_SALDO       
-                                 , PARAM.COD_EMPRESA_DET
-                                 , PARAM.COD_CONTA_DET
-                                 , SALDO_DET.VLR_SALDO_FIM    AS SALDO_CONTA_DET
-                                 , PARAM.COD_EMPRESA_CONTRA
-                                 , PARAM.COD_CONTA_CONTRA
-                                 , SALDO_CONTRA.VLR_SALDO_FIM AS SALDO_CONTA_CONTRA
-                                 
-                            FROM MSAF_PARAM_BLOCOK_ECD        PARAM
-                                 , MSAF_SALDO_DETALHADO_K     SALDO_DET
-                                 , MSAF_SALDO_DETALHADO_K     SALDO_CONTRA
-                                 
-                           WHERE 1 = 1
-                             -- FILTROS
-                             AND PARAM.COD_EMPRESA_CONS       = Pcod_empresa
-                             AND PARAM.PERIODO                = last_day(pPeriodo)
-                             AND NVL(PARAM.VLR_ELIMINACAO, 0) = 0
-                             
-                             -- JOINS
-                             
-                             AND SALDO_DET.COD_EMPRESA        = Pcod_empresa
-                             AND SALDO_DET.DATA_SALDO_CONS    = last_day(pPeriodo)
-                             AND SALDO_DET.COD_EMP_PART       = PARAM.COD_EMPRESA_DET
-                             AND SALDO_DET.COD_CONTA          = PARAM.COD_CONTA_CONTRA 
-                             
-                             AND SALDO_CONTRA.COD_EMPRESA        = Pcod_empresa
-                             AND SALDO_CONTRA.DATA_SALDO_CONS    = last_day(pPeriodo)
-                             AND SALDO_CONTRA.COD_EMP_PART       = PARAM.COD_EMPRESA_CONTRA
-                             AND SALDO_CONTRA.COD_CONTA          = PARAM.COD_CONTA_DET 
-                             )
-              LOOP
-              reg_contrapartida := null;
-              reg_partida       := null;
-              
-              -- monta linha 01 partida
-              
-              reg_partida.cod_empresa        := calc.cod_empresa_cons;
-              reg_partida.data_saldo         := last_day(pPeriodo);
-              reg_partida.cod_empresa_det    := calc.cod_empresa_det;
-              reg_partida.cod_conta_det      := calc.cod_conta_det;
-              reg_partida.cod_empresa_contra := calc.cod_empresa_contra;
-              reg_partida.cod_conta_contra   := calc.cod_conta_contra;
-              select decode(sign(calc.saldo_conta_contra),1,'C','D')
-                     into reg_partida.ind_deb_cred
-                     from dual;
-              reg_partida.vlr_eliminacao     := abs(calc.saldo_conta_contra);
-              
-              
-
-              
-              -- monta linha 02 contra partida
-              
-              reg_contrapartida.cod_empresa        := calc.cod_empresa_cons;
-              reg_contrapartida.data_saldo         := last_day(pPeriodo);
-              reg_contrapartida.cod_empresa_det    := calc.cod_empresa_contra;
-              reg_contrapartida.cod_conta_det      := calc.cod_conta_contra;
-              reg_contrapartida.cod_empresa_contra := calc.cod_empresa_det;
-              reg_contrapartida.cod_conta_contra   := calc.cod_conta_det;
-              select decode(sign(calc.saldo_conta_det),1,'C','D')
-                     into reg_contrapartida.ind_deb_cred
-                     from dual;
-              reg_contrapartida.vlr_eliminacao     := abs(calc.saldo_conta_det);
-              
-              
-              
-              -- insere partida linha 01  
-              insert into MSAF_BLOCOK_ELIMINACAO values reg_partida;
-              insert into MSAF_BLOCOK_ELIMINACAO values reg_contrapartida;
-              
-              
-              END LOOP;
-              
-              commit;
-            
-            exception
-              when others then
-               lib_proc.add_log('Erro inesperado ao inserir dados na tabela MSAF_BLOCOK_ELIMINACAO: '||SQLERRM||' - '||dbms_utility.format_error_backtrace,1);
-            END;*/
+             -- Inclusao ajuste 003
             
             begin
             
@@ -753,11 +551,9 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
                                       and   d.cod_conta           = calc.cod_conta_contra--calc.cod_conta_det
                                       and   d.cod_emp_part        = calc.cod_empresa_contra;
 
-/*                             
-                               select decode(sign(reg_partida.vlr_eliminacao),1,'C','D')
+                                 /*select decode(sign(reg_partida.vlr_eliminacao),1,'C','D')
                                       into reg_partida.ind_deb_cred
-                                      from dual;
-*/ 
+                                      from dual;*/ 
                                select decode(sign(reg_partida.vlr_eliminacao),1,'D','C')
                                       into reg_partida.ind_deb_cred
                                       from dual;
@@ -788,22 +584,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
                                       and   d.data_saldo_cons     = last_day(calc.periodo)
                                       and   d.cod_conta           = calc.cod_conta_det--calc.cod_conta_contra
                                       and   d.cod_emp_part        = calc.cod_empresa_det;--calc.cod_empresa_contra;
-/*
-                               if -- se o saldo do segundo lancamento for zero, pega da empresa contra
-                                 reg_contrapartida.vlr_eliminacao = 0 then
-                                   select nvl(max(abs(d.vlr_saldo_fim)),0)
-                                          into reg_contrapartida.vlr_eliminacao
-                                          from msaf_saldo_detalhado_k d
-                                          where 1=1
-                                          and   d.cod_empresa         = calc.cod_empresa_cons
-                                          and   d.data_saldo_cons     = last_day(calc.periodo)
-                                          and   d.cod_conta           = calc.cod_conta_contra
-                                          and   d.cod_emp_part        = calc.cod_empresa_det;
-                                      
-                               end if;
-*/
 
-                             
                                select decode(sign(reg_contrapartida.vlr_eliminacao),1,'D','C')
                                       into reg_contrapartida.ind_deb_cred
                                       from dual;
@@ -914,7 +695,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
                commit;
            end;
 
--- 002 Fim
+            -- 002 Fim
 
 
       FOR pCursorRel IN pTab.FIRST .. pTab.LAST LOOP
@@ -936,13 +717,6 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
                         from MSAF_SALDO_DETALHADO_K q
                         where q.cod_empresa = Pcod_empresa
                         AND   q.data_saldo_cons = last_day(pPeriodo)
-                        
-                        /*AND   ( EXISTS (SELECT 1 FROM msaf_param_blocok_ecd param WHERE param.cod_empresa_cons = Pcod_empresa AND param.periodo = last_day(pPeriodo) AND param.cod_conta_det = q.cod_conta)
-                               or 
-                               EXISTS (SELECT 1 FROM msaf_param_blocok_ecd param WHERE param.cod_empresa_cons = Pcod_empresa AND param.periodo = last_day(pPeriodo) AND param.cod_conta_contra = q.cod_conta)
-                               )
-                        */
-
                         group by q.cod_empresa
                               ,q.cod_estab
                               ,q.data_saldo_cons
@@ -967,122 +741,10 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
                 when others then
                   v_vlr_elimin := 0;
               end;
-              
-              
-/*
-              if mreg.vlr_saldo_fim < 0 then
-                  v_ind_dc1 := 'C';
-              else
-                  v_ind_dc1 := 'D';
-              end if;
-
-              -- verifica se tem eliminacao
-              begin
-                select sum(f.vlr_eliminacao) into v_vlr_elimin
-                from MSAF_BLOCOK_ELIMINACAO f
-                where 1=1
-                  and f.cod_empresa    = mreg.cod_empresa
-                  and f.data_saldo     = mreg.data_saldo_cons
-                  and f.cod_conta_det  = mreg.cod_conta;
-              exception
-                when others then
-                  v_vlr_elimin := null;
-              end;
-
-              if v_vlr_elimin is null then
-
-                  -- ELIMINACAO CONTRA-PARTIDA
-                  begin
-                    select sum(f.vlr_eliminacao) into v_vlr_elimin
-                    from MSAF_BLOCOK_ELIMINACAO f
-                    where 1=1
-                      and f.cod_empresa      = mreg.cod_empresa
-                      and f.data_saldo       = mreg.data_saldo_cons
-                      and f.cod_conta_contra = mreg.cod_conta;
-                  exception
-                    when others then
-                      v_vlr_elimin := 0;
-                  end;
-
-                  if v_vlr_elimin < 0 then
-                       v_ind_dc2 := 'C';
-                  else
-                       v_ind_dc2 := 'D';
-                  end if;
-
-              else
-                  -- ELINIACAO PARTIDA
-
-                  if v_vlr_elimin < 0 then
-                      v_ind_dc2 := 'C';
-                  else
-                      v_ind_dc2 := 'D';
-                  end if;
-
-              end if;
-
-              v_vlr_elimin := nvl(v_vlr_elimin, 0);
 
 
-              if v_ind_dc2 = v_ind_dc1 then
-                 v_vlr_consolid := abs(mreg.vlr_saldo_fim) - abs(v_vlr_elimin);
-              else
-                v_vlr_consolid := abs(mreg.vlr_saldo_fim) + abs(v_vlr_elimin);
-              end if;
-
-              if nvl(v_vlr_elimin, 0) = '0' then
-                 v_vlr_consolid := abs(mreg.vlr_saldo_fim);
-                 v_ind_dc2 := v_ind_dc1;
-              end if;
-
-
-              if v_vlr_elimin = 0 or mreg.vlr_saldo_fim = 0 then
-                 v_ind_dc3 := v_ind_dc1;
-              else
-                if v_vlr_consolid >= 0 then
-                    v_ind_dc3 := v_ind_dc1;
-                else
-                    v_ind_dc3 := 'C';
-                end if;
-              end if;
-
-*/
-/*
-              mLinha := NULL;
-              mLinha := LIB_STR.w(mLinha,
-                                  Pcod_empresa                       || v ||
-                                  pCod_Estab                         || v ||
-                                  to_char(mreg.data_saldo_cons, 'YYYYMMDD')               || v ||
-                                  mreg.cod_conta                     || v ||
-                                  form_vlr(abs(mreg.vlr_saldo_fim))       || v ||
-                                  v_ind_dc1                          || v ||
-
-                                  form_vlr(abs(nvl(v_vlr_elimin, 0)))            || v ||
-                                  v_ind_dc2                          || v ||
-
-                                  form_vlr(abs(v_vlr_consolid))           || v ||
-                                  v_ind_dc3,
-                                  1);
-                                  
-               LIB_PROC.add(mLinha, null, null, pTab(pCursorRel));
-*/
 
                if pTipo = '2' then -- Gera a tabela SAFX242
-/*
-                   t_safx242.cod_empresa := Pcod_empresa;
-                   t_safx242.cod_estab   := pCod_Estab;
-                   t_safx242.data_saldo_cons := to_char(mreg.data_saldo_cons, 'YYYYMMDD');
-                   t_safx242.cod_conta   := mreg.cod_conta;
-                   
-                   t_safx242.vlr_aglutinado := abs(mreg.vlr_saldo_fim) * 100;
-                   t_safx242.ind_aglutinado := v_ind_dc1;
-                   
-                   t_safx242.vlr_eliminacao := abs(nvl(v_vlr_elimin, 0)) * 100;
-                   t_safx242.ind_eliminacao := v_ind_dc2;
-                   
-                   t_safx242.vlr_consolidado := abs(v_vlr_consolid) * 100;
-                   t_safx242.ind_consolidado := v_ind_dc3;
-*/
 
                    t_safx242.cod_empresa     := Pcod_empresa;
                    t_safx242.cod_estab       := pCod_Estab;
@@ -1122,7 +784,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
 
 
                     begin
--- gerar safx242 apenas o que tiver movimento
+                    -- gerar safx242 apenas o que tiver movimento
 
                        if
                          ( nvl(trim(t_safx242.vlr_eliminacao),0)
@@ -1137,7 +799,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
 
 
 
---                       insert into safx242 values t_safx242;
+
                        
                        
                     exception
@@ -1160,38 +822,6 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
                             2);
           Cabecalho1(pTab(pCursorRel), vNome, pPeriodo);
 
-/*
-          for reg1 in (select f.cod_empresa,
-                       f.data_saldo,
-                       f.cod_conta_det COD_CONTA,
-                       h.cod_emp_part EMPRESA_PART,
-                       decode(sign(sum(f.vlr_eliminacao)), -1, 'D', 'C') IND_DC_ELIMIN,
-                       sum(f.vlr_eliminacao) VLR_ELIMIN
-                  from MSAF_BLOCOK_ELIMINACAO f, estabelecimento g, x240_inf_empresa_cons h
-                 where 1 = 1
-                   and f.cod_empresa = Pcod_empresa
-                   and f.cod_empresa = g.cod_empresa
-                   and g.cod_estab = Pcod_estab
-                   and g.cgc = h.cnpj
-                   and f.data_saldo = h.data_fim_cons
-                   and f.data_saldo = last_day(pPeriodo)
-                 group by f.cod_empresa, f.data_saldo, h.cod_emp_part, f.cod_conta_det
-                union all
-                select f.cod_empresa,
-                       f.data_saldo,
-                       f.cod_conta_det COD_CONTA,
-                       f.cod_empresa_det EMPRESA_PART,
-                       decode(sign(sum(f.vlr_eliminacao)), -1, 'C', 'D') IND_DC_ELIMIN,
-                       sum(f.vlr_eliminacao) VLR_ELIMIN
-                  from MSAF_BLOCOK_ELIMINACAO f
-                 where 1 = 1
-                   and f.cod_empresa = Pcod_empresa
-                   and f.data_saldo = last_day(pPeriodo)
-                 group by f.cod_empresa,
-                       f.data_saldo,
-                       f.cod_conta_det,
-                       f.cod_empresa_det) LOOP
-*/
           for reg1 in (SELECT B.COD_EMPRESA
                              , A.DATA_SALDO
                              , A.COD_EMPRESA_DET                                 AS EMPRESA_PART
@@ -1218,11 +848,11 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
                                       , A.COD_EMPRESA_DET
                                       , A.COD_CONTA_DET) LOOP
 
-                 --   if reg1.vlr_eliminacao < 0 then
+                    --   if reg1.vlr_eliminacao < 0 then
                         --v_ind_dc1 := reg1.ind_dc_elimin;
-                 --   else
-                 --       v_ind_dc1 := 'D';
-                 --   end if;
+                    --   else
+                    --       v_ind_dc1 := 'D';
+                    --   end if;
                  
 
 
@@ -1271,54 +901,6 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
                             'SAFX244_' || Pcod_empresa || '.csv',
                             2);
           Cabecalho1(pTab(pCursorRel), vNome, pPeriodo);
-/*
-          for mreg in (select f.cod_empresa,
-                               f.data_saldo,
-                               f.cod_conta_det COD_CONTA_CONS,
-                               f.cod_conta_det,
-                               h.cod_emp_part COD_EMPRESA_CONS,
-                               f.cod_empresa_det,
-                               decode(sign(sum(f.vlr_eliminacao)), -1, 'C', 'D') IND_DC_ELIMIN,
-                               sum(f.vlr_eliminacao) VLR_ELIMINACAO
-                          from MSAF_BLOCOK_ELIMINACAO f, estabelecimento g, x240_inf_empresa_cons h
-                         where 1 = 1
-                           and f.cod_empresa = pCod_empresa
-                           and f.cod_empresa = g.cod_empresa
-                           and g.cod_estab = pCod_Estab
-                           and g.cgc = h.cnpj
-                           and f.data_saldo = h.data_fim_cons
-                           and f.data_saldo = last_day(pPeriodo)
-                         group by f.cod_empresa,
-                                  f.data_saldo,
-                                  h.cod_emp_part,
-                                  f.cod_empresa_det,
-                                  f.cod_conta_det,
-                                  f.cod_conta_det
-                        having abs(sum(f.vlr_eliminacao)) > 0) LOOP
-*/
-/*          for mreg in (SELECT f.cod_empresa,
-                               f.data_saldo,
-                               f.cod_empresa_det COD_EMPRESA_CONS,
-                               f.cod_conta_det COD_CONTA_CONS,
-                               f.cod_empresa_contra,
-                               f.cod_conta_contra,
-                               decode(sign(SUM(f.vlr_eliminacao)), -1, 'C', 'D') IND_DC_ELIMIN,
-                               SUM(f.vlr_eliminacao) VLR_ELIMINACAO
-                          FROM MSAF_BLOCOK_ELIMINACAO f, estabelecimento g, x240_inf_empresa_cons h
-                         WHERE 1 = 1
-                           AND f.cod_empresa = pCod_empresa
-                           AND f.cod_empresa = g.cod_empresa
-                           AND g.cod_estab = pCod_Estab
-                           AND g.cgc = h.cnpj
-                           AND f.data_saldo = h.data_fim_cons
-                           AND f.data_saldo = last_day(pPeriodo)
-                         GROUP BY f.cod_empresa,
-                                  f.data_saldo,
-                                  f.cod_empresa_det,
-                                  f.cod_conta_det,
-                                  f.cod_empresa_contra,
-                                  f.cod_conta_contra
-                        HAVING abs(SUM(f.vlr_eliminacao)) > 0) LOOP*/
 
           for mreg in (SELECT f.cod_empresa,
                                f.data_saldo,
@@ -1346,20 +928,6 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
                   --else
                   --    v_ind_dc1 := 'D';
                   --end if;
-
-
-                /*  begin
-                    select distinct g.cod_emp_part
-                     into v_cod_emp_cons
-                      from x240_inf_empresa_cons g
-                    where 1=1
-                      and g.cnpj = mreg.cgc
-                      and last_day(g.data_fim_cons) = last_day(mreg.data_saldo_cons)
-                      and g.cod_empresa = pCod_empresa;
-                  exception
-                    when others then
-                      v_cod_emp_cons := null;
-                  end;*/
 
                   --
                   -- partida
@@ -1396,47 +964,6 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
                             null;
                         end;
                    end if;
-/*
-                  -- contra-partida
-                    if v_ind_dc1 = 'D' then
-                       v_ind_dc2 := 'C';
-                    else
-                       v_ind_dc2 := 'D';
-                    end if;
-
-                  mLinha := NULL;
-                  mLinha := LIB_STR.w(mLinha,
-                                      Pcod_empresa                          || v ||
-                                      pCod_Estab                            || v ||
-                                      to_char(mreg.data_saldo, 'YYYYMMDD')  || v ||
-                                      mreg.cod_conta_contra                 || v ||
-                                      mreg.cod_empresa_contra               || v ||
-                                      mreg.cod_empresa_cons                 || v ||
-                                      mreg.cod_conta_cons                   || v ||
-                                      form_vlr(abs(mreg.vlr_eliminacao))    || v ||
-                                      v_ind_dc2,
-                                      1);
-                   LIB_PROC.add(mLinha, null, null, pTab(pCursorRel));
-
-                   if pTipo = '2' then -- Gera a tabela SAFX244
-
-                       t_safx244.cod_empresa                                := Pcod_empresa;
-                       t_safx244.cod_estab                                  := pCod_Estab;
-                       t_safx244.data_saldo_cons                            := to_char(mreg.data_saldo, 'YYYYMMDD');
-                       t_safx244.cod_conta                                  := mreg.cod_conta_contra;
-                       t_safx244.cod_emp_part                               := mreg.cod_empresa_contra;
-                       t_safx244.cod_emp_contrap                            := mreg.cod_empresa_cons;
-                       t_safx244.cod_conta_contrap                          := mreg.cod_conta_cons;
-                       t_safx244.vlr_contrapartida                          := abs(mreg.vlr_eliminacao) * 100;
-                       t_safx244.ind_contrapartida                          := v_ind_dc2;
-                        begin
-                           insert into safx244 values t_safx244;
-                        exception
-                          when others then
-                            null;
-                        end;
-                   end if;
-*/
 
          end loop;
 
@@ -1525,12 +1052,12 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
 
       end loop;
 
-      LIB_PROC.add_log(mproc_id || '  Processo ', 1);
+    END;
+    
+    LIB_PROC.add_log(mproc_id || '  Processo ', 1);
       LIB_PROC.CLOSE();
 
       RETURN mproc_id;
-
-    END;
   END;
 
   PROCEDURE Cabecalho1(ptipo VARCHAR2, pnome VARCHAR2, p_periodo date) IS
