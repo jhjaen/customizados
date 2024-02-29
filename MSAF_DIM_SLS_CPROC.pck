@@ -6,7 +6,7 @@ CREATE OR REPLACE PACKAGE MSAF_DIM_SLS_CPROC is
 
 	/* VARI�VEIS DE CONTROLE DE CABE�ALHO DE RELAT�RIO */
 
-	function parametros return varchar2;
+	function parametros return varchar2
 	function nome return varchar2;
 	function tipo return varchar2;
 	function versao return varchar2;
