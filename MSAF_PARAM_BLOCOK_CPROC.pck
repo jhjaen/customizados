@@ -718,6 +718,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
 
           EXCEPTION 
             WHEN OTHERS THEN
+              lib_proc.add_log('Erro ao replicar parametros do periodo anterior: '||SQLERRM||' - '||dbms_utility.format_error_stack,1);
               lib_proc.add_log('Erro ao replicar parametros do periodo anterior: '||SQLERRM||' - '||dbms_utility.format_error_backtrace,1);
         END;
 
