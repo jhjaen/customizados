@@ -438,63 +438,16 @@ CREATE OR REPLACE PACKAGE BODY MSAF_LOAD_FILE_ECD_CPROC IS
                              and   upper(x.arquivo) = upper(pFiles(i))
                              and   nvl(trim(x.registro),'x') <> 'I355'
                              and   to_char(to_date(x.periodo),'mm') = '12';
-                       
-                      commit;
-
-/*
-                        for saldos in (select saldo_ecd.rowid
-                                             , saldo_ecd.cnpj
-                                             , saldo_ecd.registro
-                                             , saldo_ecd.periodo
-                                             , saldo_ecd.cod_conta
-                                             , x02.vlr_saldo_ini
-                                             , x02.ind_saldo_ini
-                                             , x02.vlr_tot_deb
-                                             , x02.vlr_tot_cre
-                                             , x02.vlr_saldo_fim
-                                             , x02.ind_saldo_fim
-                                             , saldo_ecd.arquivo
-                                       from treg_saldo_ecd        saldo_ecd
-                                            , estabelecimento     estab
-                                            , x2002_plano_contas  x2002
-                                            , x02_saldos          x02
-                                      where 1=1
-                                      -- joins
-                                      and   x02.ident_conta = x2002.ident_conta
-                                      and   saldo_ecd.cnpj  = estab.cgc
-                                      and   saldo_ecd.cod_conta = x2002.cod_conta
-                                      and   last_day(saldo_ecd.periodo) = last_day(x02.data_saldo)
-                                      and   estab.cod_empresa = x02.cod_empresa
-                                      and   estab.cod_estab   = x02.cod_estab
-                                      -- filtros
-                                      and   saldo_ecd.cod_conta = contas.item
-                                      and   upper(saldo_ecd.arquivo)   = upper(pFiles(i))
-                                      and   nvl(trim(saldo_ecd.registro),'X')  = 'I355' --recuperar o saldo do i355(antes do encerramento) para replicar ao saldo do i155
-                                      and   to_char(saldo_ecd.periodo,'mm') = '12'
-                                      )
-                                      
-                                      loop
-                                       update treg_saldo_ecd d
-                                              set d.ind_dc_fim = saldos.ind_saldo_fim
-                                                  , d.vlr_saldo_fim = saldos.vlr_saldo_fim
-                                              where 1=1
-                                              and   nvl(trim(d.registro),'X') = 'X'
-                                              and   d.cnpj     = saldos.cnpj
-                                              and   d.periodo  = saldos.periodo
-                                              and   d.cod_conta=saldos.cod_conta
-                                              and   upper(d.arquivo) = upper(saldos.arquivo);
-                                              
-                                              commit;
-                                      end loop;
-*/
-                      END LOOP;
-                 END IF;
+                    END LOOP;
+                      
+                END IF;
 
                  dados_relatorio(pFiles(i), v_qtde_reg, vn_rel);
 
                  LIB_PROC.add_log('Arquivo: ' || pFiles(i) || ' -  Qtde Registros: ' || v_qtde_reg, 1);
 
               end loop;
+              commit;
 
               final_html(vn_rel);
 
