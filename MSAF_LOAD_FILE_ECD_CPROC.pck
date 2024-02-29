@@ -320,7 +320,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_LOAD_FILE_ECD_CPROC IS
                     pContaX02         varchar2
                     ) RETURN INTEGER IS
 
-    /* Variaveis de Trabalho */
+    -- Variaveis de Trabalho */
     mproc_id          INTEGER;
     vn_rel            number:=1;
     vs_nome_interface varchar2(300);
@@ -337,7 +337,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_LOAD_FILE_ECD_CPROC IS
 
     Finalizar EXCEPTION;
     
-    vs_ind_saldo_fim char(1);
+    vs_ind_saldo_fim varchar2(1);
     vs_saldo_fim     varchar2(19);
 
 
@@ -351,9 +351,9 @@ CREATE OR REPLACE PACKAGE BODY MSAF_LOAD_FILE_ECD_CPROC IS
         --    Mcod_Empresa := Pcod_empresa; --Lib_Parametros.Recuperar('EMPRESA');
 
 
-    /***************************************************/
-    /* Inclui Header/Footer do Log de Erros            */
-    /***************************************************/
+    /**************************************************
+     Inclui Header/Footer do Log de Erros            
+    **************************************************/
     linha_log := 'Log de Processo: '||mproc_id;
     lib_proc.Add_Log('.                                                                                                        '||linha_log, 0);
 
@@ -361,9 +361,9 @@ CREATE OR REPLACE PACKAGE BODY MSAF_LOAD_FILE_ECD_CPROC IS
     lib_proc.Add_Log(rpad('-', 200, '-'), 0);
     lib_proc.Add_Log(' ', 0);
 
-    /***************************************************************/
-    /* Valida��o de datas inicial e final informadas com par�metro */
-    /***************************************************************/
+    /**************************************************************
+     Valida��o de datas inicial e final informadas com par�metro 
+    **************************************************************/
 
 --    end if;
     LIB_PROC.add_tipo(mproc_id, vn_rel, 'ECD_BLOCOK', 3,48,150, '8', 'Relatorio');

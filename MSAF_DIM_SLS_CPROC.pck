@@ -4,7 +4,7 @@ CREATE OR REPLACE PACKAGE MSAF_DIM_SLS_CPROC is
 	-- Created       : 27/09/2005
 	-- Purpose       : Gera��o do arquivo para entrega da DIM - S�o Luis, conforme layout fornecido pela prefeitura
 
-	/* VARI�VEIS DE CONTROLE DE CABE�ALHO DE RELAT�RIO */
+	-- VARI�VEIS DE CONTROLE DE CABE�ALHO DE RELAT�RIO 
 
 	function parametros return varchar2
 	function nome return varchar2;
@@ -97,7 +97,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_DIM_SLS_CPROC is
       		           PDT_INICIO  DATE,
       		           PDT_FINAL   DATE) RETURN INTEGER IS
 
-		/* Vari�veis de Trabalho */
+		-- Vari�veis de Trabalho 
     mproc_id          INTEGER;
     mLinha            VARCHAR2(1000);
     v_insc_mun        VARCHAR2(15);

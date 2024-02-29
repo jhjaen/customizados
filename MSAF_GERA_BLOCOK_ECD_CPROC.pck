@@ -8,16 +8,16 @@ CREATE OR REPLACE PACKAGE MSAF_GERA_BLOCOK_ECD_CPROC IS
   --##             PARA O BLOCO K - ECD                                      ##
   --###########################################################################
 
-  /* Declara�?o de Vari�veis P�blicas */
+  -- Declara�?o de Vari�veis P�blicas
   Cursor C1(v_periodo in date) is
-      select    c.cod_emp_part cod_empresa,
+      select    c.cod_emp_part as cod_empresa,
                 a.cnpj,
                 a.periodo,
-                b.cod_conta_cons cod_conta,
+                b.cod_conta_cons as cod_conta,
                 SUM(decode(a.ind_dc_fim,
                             'D',
                             nvl(a.vlr_saldo_fim, 0),
-                            nvl(a.vlr_saldo_fim, 0) * -1)) VLR_SALDO_FIM
+                            nvl(a.vlr_saldo_fim, 0) * -1)) as VLR_SALDO_FIM
             from treg_saldo_ecd a,
                  sped_contas_emp_cons b,
                  x240_inf_empresa_cons c
@@ -304,7 +304,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
                     pTipo        Varchar2,
                     pTab         lib_proc.varTab) RETURN INTEGER IS
 
-    /* Variaveis de Trabalho */
+    -- Variaveis de Trabalho */
     mproc_id          INTEGER;
     mLinha            VARCHAR2(1000);
     v                 char(1) := ';';
@@ -350,9 +350,9 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
       LIB_PROC.add_log('Log gerado', 1);
       --    Mcod_Empresa := Pcod_empresa; --Lib_Parametros.Recuperar('EMPRESA');
 
-      /***************************************************/
-      /* Inclui Header/Footer do Log de Erros            */
-      /***************************************************/
+      --**************************************************/
+      -- Inclui Header/Footer do Log de Erros            */
+      --**************************************************/
       lib_proc.Add_Log(RazaoEmp_w, 0);
       lib_proc.Add_Log('Filial: ' || Pcod_Estab || ' - ' || RazaoEst_w, 0);
       lib_proc.Add_Log('CNPJ: ' || CGC_w, 0);
@@ -369,9 +369,9 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
       lib_proc.Add_Log(rpad('-', 200, '-'), 0);
       lib_proc.Add_Log(' ', 0);
 
-      /***************************************************************/
-      /* Valida��o de datas inicial e final informadas com par�metro */
-      /***************************************************************/
+      --**************************************************************/
+      -- Valida��o de datas inicial e final informadas com par�metro */
+      --**************************************************************/
 
       If pCod_empresa is null Then
         lib_proc.Add_Log('Erro: A Empresa deve ser informada.', 0);

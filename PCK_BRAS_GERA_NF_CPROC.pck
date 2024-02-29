@@ -1,5 +1,5 @@
 CREATE OR REPLACE PACKAGE PCK_BRAS_GERA_NF_CPROC IS
-
+-- relatorio para geracao
   FUNCTION Parametros RETURN VARCHAR2;
   FUNCTION Nome RETURN VARCHAR2;
   FUNCTION Tipo RETURN VARCHAR2;
@@ -128,7 +128,7 @@ div              {position: absolute; }
                pCodestab      estabelecimento.cod_estab%type,
                pDatIni        date,
                pDatFim        date,
-               pTipoGear      char,     
+               pTipoGear      varchar2,     
                pNumDocFis     x07_docto_fiscal.num_docfis%type,   
                pNumDocFisIni  x07_docto_fiscal.num_docfis%type,
                pNumDocFisFim  x07_docto_fiscal.num_docfis%type) is
@@ -172,7 +172,7 @@ div              {position: absolute; }
               )
          --and a.data_fiscal between to_date(p_DataIni,'mm/yyyy') and last_day(to_date(p_DataIni,'mm/yyyy'))
          and a.data_fiscal between pDatIni and pDatFim
-       order by a.num_docfis 
+       order by a.num_docfis ASC
          ;
 
 
@@ -189,14 +189,14 @@ div              {position: absolute; }
            x2018.cod_servico,
            x2018.descricao,
            vlr_servico,
-           grouping(x09.num_item) grp1,
-           sum(nvl(VLR_BASE_ISS_RETIDO,0)) VLR_BASE_ISS_RETIDO  ,
-           sum(nvl(VLR_ISS_RETIDO     ,0)) VLR_ISS_RETIDO       ,
-           sum(nvl(vlr_base_inss      ,0)) vlr_base_inss        ,
-           sum(nvl(VLR_INSS_RETIDO    ,0)) VLR_INSS_RETIDO      ,
-           sum(nvl(VLR_PIS_RETIDO     ,0)) VLR_PIS_RETIDO       ,
-           sum(nvl(VLR_COFINS_RETIDO  ,0)) VLR_COFINS_RETIDO    ,
-           sum(nvl(vlr_csll           ,0)) vlr_csll
+           grouping(x09.num_item) as grp1,
+           sum(nvl(VLR_BASE_ISS_RETIDO,0)) as VLR_BASE_ISS_RETIDO  ,
+           sum(nvl(VLR_ISS_RETIDO     ,0)) as VLR_ISS_RETIDO       ,
+           sum(nvl(vlr_base_inss      ,0)) as vlr_base_inss        ,
+           sum(nvl(VLR_INSS_RETIDO    ,0)) as VLR_INSS_RETIDO      ,
+           sum(nvl(VLR_PIS_RETIDO     ,0)) as VLR_PIS_RETIDO       ,
+           sum(nvl(VLR_COFINS_RETIDO  ,0)) as VLR_COFINS_RETIDO    ,
+           sum(nvl(vlr_csll           ,0)) as vlr_csll
            
       from x09_itens_serv x09, x2018_servicos x2018
      where 1 = 1
@@ -275,9 +275,9 @@ CREATE OR REPLACE PACKAGE BODY PCK_BRAS_GERA_NF_CPROC IS
     end;
 
     begin
-      select to_date(decode(to_char(add_months(sysdate, -1), 'yyyy') - to_char(sysdate, 'yyyy'),0,to_char(sysdate, 'yyyy'),to_char(sysdate, 'yyyy') - 1),'yyyy') iniAno,
-             1 iniPerd,
-             to_char(add_months(sysdate, -1), 'mm') * 1 iniPeri
+      select to_date(decode(to_char(add_months(sysdate, -1), 'yyyy') - to_char(sysdate, 'yyyy'),0,to_char(sysdate, 'yyyy'),to_char(sysdate, 'yyyy') - 1),'yyyy') as iniAno,
+             1 as iniPerd,
+             to_char(add_months(sysdate, -1), 'mm') * 1 as iniPeri
         into iniAno, iniPerd, iniPeri
         from dual;
     end;
@@ -448,7 +448,7 @@ CREATE OR REPLACE PACKAGE BODY PCK_BRAS_GERA_NF_CPROC IS
                     pNumDocFisIni x07_docto_fiscal.num_docfis%type,
                     pNumDocFisFim x07_docto_fiscal.num_docfis%type) RETURN INTEGER IS
 
-    /* Variaveis de Trabalho */
+    -- Variaveis de Trabalho */
     mproc_id            Integer;
     --mLinha              Varchar2(2000);
     --v_tot07             number :=0;

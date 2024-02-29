@@ -7,7 +7,7 @@ CREATE OR REPLACE PACKAGE MSAF_PARAM_BLOCOK_CPROC IS
   --## Objetivo : PARAMETRO PARA GERA��O DO BLOCO K - ECD                    ##
   --###########################################################################
 
-  /* Declara�?o de Vari�veis P�blicas */
+  -- Declara�?o de Vari�veis P�blicas */
   vNome  estabelecimento.razao_social%TYPE;
 
   FUNCTION Parametros RETURN         VARCHAR2;
@@ -328,7 +328,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
                     pRegistro            lib_proc.varTab
                     ) RETURN INTEGER IS
 
-    /* Variaveis de Trabalho */
+    -- Variaveis de Trabalho */
     mproc_id          INTEGER;
     mLinha            VARCHAR2(1000);
     v_tipo            varchar2(100);
@@ -371,9 +371,9 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
         --    Mcod_Empresa := Pcod_empresa; --Lib_Parametros.Recuperar('EMPRESA');
 
 
-    /***************************************************/
-    /* Inclui Header/Footer do Log de Erros            */
-    /***************************************************/
+    /**************************************************
+     Inclui Header/Footer do Log de Erros            
+    **************************************************/
     lib_proc.Add_Log(RazaoEmp_w, 0);
  --   lib_proc.Add_Log('Filial: ' || Pcod_Estab || ' - ' || RazaoEst_w, 0);
  --   lib_proc.Add_Log('CNPJ: '   || CGC_w, 0);
@@ -388,9 +388,9 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
     lib_proc.Add_Log(rpad('-', 200, '-'), 0);
     lib_proc.Add_Log(' ', 0);
 
-    /***************************************************************/
-    /* Valida��o de datas inicial e final informadas com par�metro */
-    /***************************************************************/
+    /**************************************************************
+     Valida��o de datas inicial e final informadas com par�metro 
+    **************************************************************/
 
     if pTipo = '1' then
 
@@ -670,7 +670,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
                LIB_PROC.add_log('Relat�rio Confer�ncia!', 1);
 
               for mreg in (
-                         select p.rowid rowid_param, p.*
+                         select p.rowid as rowid_param, p.*
                          from MSAF_PARAM_BLOCOK_ECD p
                          where  p.cod_empresa_cons = pCodEmpConsol
                            and p.periodo = last_day(pPeriodo)

@@ -1,13 +1,13 @@
 CREATE OR REPLACE PACKAGE MSAF_PARAM2_BLOCOK_CPROC IS
 
-  --###########################################################################
-  --## Autor    : Diego  Peres                                               ##
-  --## Cria�?o  : 25/05/2020                                                 ##
-  --## Empresa  : ATVI Consultoria                                           ##
-  --## Objetivo : PARAMETRO PARA GERA��O DO BLOCO K - ECD                    ##
-  --###########################################################################
+  /*#########################################################################
+  ## Autor    : Diego  Peres                                               ##
+  ## Criacao  : 25/05/2020                                                 ##
+  ## Empresa  : ATVI Consultoria                                           ##
+  ## Objetivo : PARAMETRO PARA GERACAO DO BLOCO K - ECD                    ##
+  ###########################################################################*/
 
-  /* Declara�?o de Vari�veis P�blicas */
+  -- Declara�?o de Vari�veis P�blicas */
   vNome  estabelecimento.razao_social%TYPE;
 
   FUNCTION Parametros RETURN         VARCHAR2;
@@ -287,7 +287,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
                     pFiles            lib_proc.varTab
                     ) RETURN INTEGER IS
 
-    /* Variaveis de Trabalho */
+    -- Variaveis de Trabalho */
     mproc_id          INTEGER;
     vn_rel            number:=1;
     vs_nome_interface varchar2(300);
@@ -324,9 +324,9 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
             LIB_PROC.add_log('Log gerado', 1);
 
 
-    /***************************************************/
-    /* Inclui Header/Footer do Log de Erros            */
-    /***************************************************/
+    /**************************************************
+    ** Inclui Header/Footer do Log de Erros            
+    **************************************************/
     linha_log := 'Log de Processo: '||mproc_id;
     lib_proc.Add_Log('.                                                                                                        '||linha_log, 0);
 
@@ -334,9 +334,9 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
     lib_proc.Add_Log(rpad('-', 200, '-'), 0);
     lib_proc.Add_Log(' ', 0);
 
-    /***************************************************************/
-    /* Valida��o de datas inicial e final informadas com par�metro */
-    /***************************************************************/
+    /**************************************************************
+    ** Valida��o de datas inicial e final informadas com par�metro 
+    **************************************************************/
 
      if pReplySafx240 = 'S' then
          PRC_REPLY_PARAM(COD_EMPRESA => pCodEmpresa,
@@ -347,16 +347,6 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
      end if;
 
      -- regra selecao carga csv
-     /*
-     IF
-       pCarregaCsv = 'S' AND pCarregaCsvParam = 'S' THEN
-       lib_proc.add_log('Selecione apenas uma op��o de carga CSV por vez.',1);
-       lib_proc.add_log('Processamento n�o realizado.',1);
-
-       RAISE exSelecao;
-
-     END IF;
-     */
 
      if pReplySafx262 = 'S' then
          PRC_REPLY_PARAM(COD_EMPRESA => pCodEmpresa,
@@ -365,98 +355,6 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
                          DESTINO => pExercicio);
 
      end if;
-     
-     /*
-
-     if (pCarregaCsv = 'S' and pDirectory is not null) THEN
-
-     execute immediate 'truncate table safx262';
-
-      -- grupo x2002
-      saf_pega_grupo(P_CD_EMPR       => mcod_empresa,
-                     P_CD_ESTAB      => mcod_estab,
-                     P_CD_TABELA     => '2002',
-                     P_VALID_INICIAL => ADD_MONTHS(TRUNC (SYSDATE, 'YEAR'), -1 ) +30,  -- recupera o grupo de cadastro referente ano anterior
-                     P_GRUPO         => v_grupo);
-
-      for i IN pFiles.FIRST..pFiles.LAST  loop
-
-        v_arquivo      := utl_file.fopen(pDirectory, pFiles(i), 'R');
-       -- v_arquivo      := utl_file.fopen(pDirectory, 'safx262.csv', 'R');
-
-        loop
-            begin
-              utl_file.get_line(v_arquivo, v_linha);
-              v_linha := replace(v_linha, '"', '');
-
-               if v_linha not like '%COD_EMPRESA%' then
-
-                t_x262.cod_empresa    := SUBSTR(v_linha,1,(INSTR(v_linha, wDelimiter, 1, 1) - 1));
-                t_x262.cod_estab      := SUBSTR(v_linha,INSTR(v_linha, wDelimiter, 1, 1) + 1,(INSTR(v_linha, wDelimiter, 1, 2) - INSTR(v_linha, wDelimiter, 1, 1) - 1));
-                v_data_ini            := SUBSTR(v_linha,INSTR(v_linha, wDelimiter, 1, 2) + 1,(INSTR(v_linha, wDelimiter, 1, 3) - INSTR(v_linha, wDelimiter, 1, 2) - 1));
-                t_x262.data_ini_cons  := to_date(substr(v_data_ini, 7, 2) || '/' ||  substr(v_data_ini, 5, 2) || '/' || substr(v_data_ini, 1, 4), 'dd/mm/rrrr');
-                v_data_fim            := SUBSTR(v_linha,INSTR(v_linha, wDelimiter, 1, 3) + 1,(INSTR(v_linha, wDelimiter, 1, 4) - INSTR(v_linha, wDelimiter, 1, 3) - 1));
-                t_x262.data_fim_cons  := to_date(substr(v_data_fim, 7, 2) || '/' ||  substr(v_data_fim, 5, 2) || '/' || substr(v_data_fim, 1, 4), 'dd/mm/rrrr');
-                t_x262.cod_emp_part   := SUBSTR(v_linha,INSTR(v_linha, wDelimiter, 1, 4) + 1,(INSTR(v_linha, wDelimiter, 1, 5) - INSTR(v_linha, wDelimiter, 1, 4) - 1));
-               -- t_x262.grupo_conta    := SUBSTR(v_linha,INSTR(v_linha, wDelimiter, 1, 5) + 1,(INSTR(v_linha, wDelimiter, 1, 6) - INSTR(v_linha, wDelimiter, 1, 5) - 1));
-                t_x262.grupo_conta    := v_grupo;
-                t_x262.cod_conta      := SUBSTR(v_linha,INSTR(v_linha, wDelimiter, 1, 5) + 1,(INSTR(v_linha, wDelimiter, 1, 6) - INSTR(v_linha, wDelimiter, 1, 5) - 1));
-                t_x262.cod_conta_cons := trim(SUBSTR(v_linha,INSTR(v_linha, wDelimiter, 1, 6) + 1, 70));
-
-                -- alteracao para inserir dados na safx262
-                t_sx262.cod_empresa := t_x262.cod_empresa;
-                t_sx262.COD_ESTAB   := t_x262.cod_estab;
-                t_sx262.DATA_INI_CONS := to_char(t_x262.data_ini_cons,'yyyymmdd');
-                t_sx262.DATA_FIM_CONS := to_char(t_x262.data_fim_cons,'yyyymmdd');
-                t_sx262.COD_EMP_PART  := t_x262.cod_emp_part;
-                t_sx262.COD_CONTA     := t_x262.cod_conta;
-                t_sx262.DAT_GRAVACAO  := sysdate;
-                t_sx262.COD_CONTA_CONS  := t_x262.cod_conta_cons;
-
-                --
-                begin
-                  --insert into sped_contas_emp_cons values t_x262;
-                  insert into safx262 values t_sx262;
-
-                  if sql%rowcount > 0 then
-                     v_commit := v_commit + 1;
-                  end if;
-
-                  if v_commit = 1000 then
-                    commit;
-                    v_commit := 0;
-                  end if;
-                --
-                exception
-                  when others then
-                    v_error := 'Erro: ' || sqlerrm;
-                    LIB_PROC.add_log('Erro na carga do arquivo: ' || sqlerrm, 1);
-                end;
-                --
-             end if;
-            exception
-              when no_data_found then
-                utl_file.fclose(v_arquivo);
-                commit;
-                exit;
-            end;
-          end loop;
-
-        utl_file.fclose(v_arquivo);
-
-       end loop;
-    end if;
-    */
-
-/*
-    IF (pGeraSafx262Aglut = 'S') THEN
-
-       PRC_GER262_AGLUT(pExercicio);
-
-    NULL;
-
-    END IF;
-*/
 
 
      if (pCarregaCsvParam = 'S' and pDirectory is not null) THEN -- carga de parametros (contas detentoras e contrapartidas)

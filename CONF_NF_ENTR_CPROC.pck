@@ -1,12 +1,12 @@
 create or replace package CONF_NF_ENTR_CPROC is
 
-	/* Declara��o de Vari�veis P�blicas */
+	-- Declara��o de Vari�veis P�blicas */
   w_cod_emp            estabelecimento.cod_empresa%type;
   w_cod_estab          estabelecimento.cod_estab%type;
   w_razao              estabelecimento.razao_social%type;
   w_usuario            varchar2(20);
 
-	/* VARI�VEIS DE CONTROLE DE CABE�ALHO DE RELAT�RIO */
+	-- VARI�VEIS DE CONTROLE DE CABE�ALHO DE RELAT�RIO */
 	function parametros return varchar2;
 
 	function nome return varchar2;
@@ -148,7 +148,7 @@ CREATE OR REPLACE PACKAGE BODY CONF_NF_ENTR_CPROC is
                     P_PERIODO_FIM    DATE,
                     P_TIPO_REL       VARCHAR2,
                     P_COD_GRP_INCENT VARCHAR2) RETURN INTEGER IS
-    /* cursores */
+    -- cursores 
 
     cursor cNotas (P_COD_EMPRESA VARCHAR2, P_COD_ESTAB VARCHAR2, P_COD_GRP_INCENT VARCHAR2, P_DATA_INI DATE, P_DATA_FIM DATE) is
     -- Documentos com itens
@@ -157,14 +157,14 @@ CREATE OR REPLACE PACKAGE BODY CONF_NF_ENTR_CPROC is
                docto.serie_docfis,
                docto.sub_serie_docfis,
                docto.num_docfis,
-               to_char(item.num_item) item,
+               to_char(item.num_item) as item,
                cfo.cod_cfo,
                nat.cod_natureza_op,
-               prod.descricao produto,
-               pfj.razao_social emitente,
-               item.vlr_contab_item  vlr_contab_item,
-               item.vlr_tributo_icms vlr_tributo_icms,
-               item.vlr_fecp_icms    vlr_fecp_icms,
+               prod.descricao as produto,
+               pfj.razao_social as emitente,
+               item.vlr_contab_item as vlr_contab_item,
+               item.vlr_tributo_icms as vlr_tributo_icms,
+               item.vlr_fecp_icms   as vlr_fecp_icms,
                guia.ind_incent
         FROM dwt_docto_fiscal docto,
              dwt_itens_merc item,
@@ -210,14 +210,14 @@ CREATE OR REPLACE PACKAGE BODY CONF_NF_ENTR_CPROC is
                docto.serie_docfis,   -- 3
                docto.sub_serie_docfis,  -- 4
                docto.num_docfis,     -- 5
-               's/item' item,        -- 6
+               's/item' as item,        -- 6
                cfo.cod_cfo,
                nat.cod_natureza_op,
-               ' ' produto,
-               pfj.razao_social emitente,
-               docto.vlr_tot_nota  vlr_contab_item, -- 10
-               docto.vlr_tributo_icms vlr_tributo_icms, -- 11
-               0    vlr_fecp_icms,
+               ' ' as produto,
+               pfj.razao_social as emitente,
+               docto.vlr_tot_nota as vlr_contab_item, -- 10
+               docto.vlr_tributo_icms as vlr_tributo_icms, -- 11
+               0   as vlr_fecp_icms,
                guia.ind_incent
         FROM dwt_docto_fiscal docto,
              ict_guia_incent guia,
@@ -254,7 +254,7 @@ CREATE OR REPLACE PACKAGE BODY CONF_NF_ENTR_CPROC is
 
     rNotas cNotas%ROWTYPE;
 
-    /* Vari�veis locais  */
+    -- Vari�veis locais  */
 
     vStatus   INTEGER;
     vRazao_social_est  estabelecimento.razao_social%TYPE;
@@ -274,7 +274,7 @@ CREATE OR REPLACE PACKAGE BODY CONF_NF_ENTR_CPROC is
 
     vTitRel              VARCHAR2(170);
 
-    /* Subrotinas */
+    --Subrotinas */
 
     FUNCTION CENTRA(pDado IN VARCHAR2, pTamCol IN INTEGER) RETURN VARCHAR2 IS
       vEsqDir  Integer;  -- Espa�o entre as margens das colunas
