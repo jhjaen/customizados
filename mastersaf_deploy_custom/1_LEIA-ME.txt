@@ -1,0 +1,31 @@
+-- Aplicação Banco de dados
+
+######################################################################################################
+1° Passo
+
+
+Usuário SYS
+-> Consta o arquivo para ser aplicado com o usuário SYSDBA
+-> Certificar-se que o grant seja dado no usuário correto (owner mastersaf dw = msaf_prod)
+
+arquivo: grants_mastersaf.sql
+
+
+
+
+######################################################################################################
+2º Passo
+
+Usuário MSAF_PROD
+-> Constam todos os objetos que compõe o processo customizado
+Conectado com o usuário MSAF no SQL*Plus, basta executar o arquivo "apply_custom.sql"
+
+SQL> @apply_custom.sql
+
+
+Enviar o arquivo de Logs caso ocorra erros.
+
+
+########################################################################################################
+
+

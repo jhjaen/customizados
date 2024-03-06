@@ -161,9 +161,9 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
 
   --###################################################################################
   --## Autor    : Diego  Peres                                                       ##
-  --## Cria�ao  : 25/05/2020                                                         ##
+  --## Cria�ao  : 25/05/2020                                                        ##
   --## Empresa  : ATVI Consultoria                                                   ##
-  --## Objetivo : GERA��O DAS TABELAS SAFX242, SAFX243 E SAFX244                     ##
+  --## Objetivo : GERA��O DAS TABELAS SAFX242, SAFX243 E SAFX244                   ##
   --##             PARA O BLOCO K - ECD                                              ##
   --## Ajustes  :                                                                    ##
   --##            001 - 22/04/2021                                                   ##
@@ -171,7 +171,6 @@ CREATE OR REPLACE PACKAGE BODY MSAF_GERA_BLOCOK_ECD_CPROC IS
   --##                                                                               ##
   --##            002 -  30/04/2021                                                  ##
   --##            Alteracao na regra de composicao das eliminacoes                   ##
-  
   --##            003 - 27/04/2023                                                   ##
   --##            Alteracao na regra de composicao das eliminacoes                   ##
   --###################################################################################
