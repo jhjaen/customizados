@@ -1,13 +1,13 @@
 CREATE OR REPLACE PACKAGE MSAF_PARAM2_BLOCOK_CPROC IS
 
-  /*#########################################################################
-  ## Autor    : Diego  Peres                                               ##
-  ## Criacao  : 25/05/2020                                                 ##
-  ## Empresa  : ATVI Consultoria                                           ##
-  ## Objetivo : PARAMETRO PARA GERACAO DO BLOCO K - ECD                    ##
-  ###########################################################################*/
+  --###########################################################################
+  --## Autor    : Diego  Peres                                               ##
+  --## Criaç?o  : 25/05/2020                                                 ##
+  --## Empresa  : ATVI Consultoria                                           ##
+  --## Objetivo : PARAMETRO PARA GERAÇÃO DO BLOCO K - ECD                    ##
+  --###########################################################################
 
-  -- Declaraï¿½?o de Variï¿½veis Pï¿½blicas */
+  /* Declaraç?o de Variáveis Públicas */
   vNome  estabelecimento.razao_social%TYPE;
 
   FUNCTION Parametros RETURN         VARCHAR2;
@@ -38,9 +38,9 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
 
   --###########################################################################
   --## Autor    : Diego  Peres                                               ##
-  --## Criaï¿½?o  : 25/05/2020                                                 ##
+  --## Criaç?o  : 25/05/2020                                                 ##
   --## Empresa  : ATVI Consultoria                                           ##
-  --## Objetivo : PARAMETRO PARA GERAï¿½ï¿½O DO BLOCO K - ECD                    ##
+  --## Objetivo : PARAMETRO PARA GERAÇÃO DO BLOCO K - ECD                    ##
   --## Ajustes  :                                                            ##
   --##            001 - Felipe Guimaraes 19/04/2021                          ##
   --##            Permitir geracao da SAFX262 atraves das aglutinacoes       ##
@@ -56,15 +56,15 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
 
   v_linha         varchar2(32767) := '';
   v_arquivo       utl_file.file_type;
-  wDelimiter      varchar2(1) := ';';
-  --v_commit        number :=0;
-  --v_error         varchar2(255) := null;
+  wDelimiter      char(1) := ';';
+  v_commit        number :=0;
+  v_error         varchar2(255) := null;
 
-  --t_x262          sped_contas_emp_cons%rowtype := null;
-  --t_sx262         safx262%rowtype := null;
+  t_x262          sped_contas_emp_cons%rowtype := null;
+  t_sx262         safx262%rowtype := null;
 
   v_num           number :=0;
-  --v_qtde_reg      number :=0;
+  v_qtde_reg      number :=0;
 
   FUNCTION f_get_string ( p_string         VARCHAR2
                          , p_posicao       PLS_INTEGER
@@ -136,7 +136,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
 
     -- :2
     Lib_Proc.Add_Param(Pstr,
-                       'Exercï¿½cio',
+                       'Exercício',
                        'varchar2',
                        'Textbox',
                        'S',
@@ -196,7 +196,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
    -- :6
 /*
     LIB_PROC.add_param(pstr,
-                       'Gerar SAFX262 atravï¿½s da estrutura de aglutinaï¿½ï¿½es (SAFX2102 e SAFX2103)',
+                       'Gerar SAFX262 através da estrutura de aglutinações (SAFX2102 e SAFX2103)',
                        'Varchar2',
                        'CheckBox',
                        'N',
@@ -206,7 +206,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
 
    -- :5
     LIB_PROC.add_param(pstr,
-                       'Carregar CSV - Parametrizaï¿½ï¿½es de Contas Detentoras, Contrapartidas e Eliminaï¿½ï¿½es',
+                       'Carregar CSV - Parametrizações de Contas Detentoras, Contrapartidas e Eliminações',
                        'Varchar2',
                        'CheckBox',
                        'N',
@@ -215,7 +215,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
 
     --:6
     LIB_PROC.add_param(pstr,
-                       'Selecione o Diretï¿½rio: ',
+                       'Selecione o Diretório: ',
                        'Varchar2',
                        'Combobox',
                        'N',
@@ -230,7 +230,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
 
     --:7
     LIB_PROC.add_param(pstr,
-                       'Arquivos no Diretï¿½rio',
+                       'Arquivos no Diretório',
                        'Varchar2',
                        'MultiSelect',
                        'N',
@@ -245,7 +245,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
 
   FUNCTION Nome RETURN VARCHAR2 IS
   BEGIN
-    RETURN '2.0 - Carga e Geraï¿½ï¿½o de parï¿½metros (SAFX240, SAFX262, Contas Detentoraras e Contrapartidas) - ECD';
+    RETURN '2.0 - Carga e Geração de parâmetros (SAFX240, SAFX262, Contas Detentoraras e Contrapartidas) - ECD';
   END Nome;
 
   FUNCTION Tipo RETURN VARCHAR2 IS
@@ -262,7 +262,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
   BEGIN
     RETURN '- SAFX240 - Replicar dados de periodos anteriores'||chr(13)||
            '- SAFX262 - Replicar dados de periodos anteriores'||chr(13)||
-           '- Carregar CSV de parametros de geraï¿½ï¿½o do bloco k (Contas Detentoras, Contrapartidas e eliminacoes)';
+           '- Carregar CSV de parametros de geração do bloco k (Contas Detentoras, Contrapartidas e eliminacoes)';
   END;
 
   FUNCTION Modulo RETURN VARCHAR2 IS
@@ -287,27 +287,27 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
                     pFiles            lib_proc.varTab
                     ) RETURN INTEGER IS
 
-    -- Variaveis de Trabalho */
+    /* Variaveis de Trabalho */
     mproc_id          INTEGER;
-    --vn_rel            number:=1;
-    --vs_nome_interface varchar2(300);
-    --vs_nome_rel       varchar2(3000);
-    --vs_processo       varchar2(100);
-    --vs_msg            varchar2(200):=null;
+    vn_rel            number:=1;
+    vs_nome_interface varchar2(300);
+    vs_nome_rel       varchar2(3000);
+    vs_processo       varchar2(100);
+    vs_msg            varchar2(200):=null;
 
-    --v_data_ini        varchar2(8) := null;
-    --v_data_fim        varchar2(8) := null;
+    v_data_ini        varchar2(8) := null;
+    v_data_fim        varchar2(8) := null;
 
-    --v_grupo           sped_contas_emp_cons.grupo_conta%TYPE;
+    v_grupo           sped_contas_emp_cons.grupo_conta%TYPE;
 
-    --v_finalizar       number := 0;
+    v_finalizar       number := 0;
 
-    --Status_w         INTEGER;
-    --RazaoEst_w       ESTABELECIMENTO.RAZAO_SOCIAL%TYPE;
-    --CGC_w            ESTABELECIMENTO.CGC%TYPE;
+    Status_w         INTEGER;
+    RazaoEst_w       ESTABELECIMENTO.RAZAO_SOCIAL%TYPE;
+    CGC_w            ESTABELECIMENTO.CGC%TYPE;
     linha_log       varchar2(100);
 
-    --Finalizar EXCEPTION;
+    Finalizar EXCEPTION;
     exSelecao EXCEPTION;
 
     rParam_ecd      msaf_param_blocok_ecd%ROWTYPE;
@@ -324,9 +324,9 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
             LIB_PROC.add_log('Log gerado', 1);
 
 
-    /**************************************************
-    ** Inclui Header/Footer do Log de Erros            
-    **************************************************/
+    /***************************************************/
+    /* Inclui Header/Footer do Log de Erros            */
+    /***************************************************/
     linha_log := 'Log de Processo: '||mproc_id;
     lib_proc.Add_Log('.                                                                                                        '||linha_log, 0);
 
@@ -334,9 +334,9 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
     lib_proc.Add_Log(rpad('-', 200, '-'), 0);
     lib_proc.Add_Log(' ', 0);
 
-    /**************************************************************
-    ** Validaï¿½ï¿½o de datas inicial e final informadas com parï¿½metro 
-    **************************************************************/
+    /***************************************************************/
+    /* Validação de datas inicial e final informadas com parâmetro */
+    /***************************************************************/
 
      if pReplySafx240 = 'S' then
          PRC_REPLY_PARAM(COD_EMPRESA => pCodEmpresa,
@@ -347,6 +347,16 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
      end if;
 
      -- regra selecao carga csv
+     /*
+     IF
+       pCarregaCsv = 'S' AND pCarregaCsvParam = 'S' THEN
+       lib_proc.add_log('Selecione apenas uma opção de carga CSV por vez.',1);
+       lib_proc.add_log('Processamento não realizado.',1);
+
+       RAISE exSelecao;
+
+     END IF;
+     */
 
      if pReplySafx262 = 'S' then
          PRC_REPLY_PARAM(COD_EMPRESA => pCodEmpresa,
@@ -355,16 +365,104 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
                          DESTINO => pExercicio);
 
      end if;
+     
+     /*
+
+     if (pCarregaCsv = 'S' and pDirectory is not null) THEN
+
+     execute immediate 'truncate table safx262';
+
+      -- grupo x2002
+      saf_pega_grupo(P_CD_EMPR       => mcod_empresa,
+                     P_CD_ESTAB      => mcod_estab,
+                     P_CD_TABELA     => '2002',
+                     P_VALID_INICIAL => ADD_MONTHS(TRUNC (SYSDATE, 'YEAR'), -1 ) +30,  -- recupera o grupo de cadastro referente ano anterior
+                     P_GRUPO         => v_grupo);
+
+      for i IN pFiles.FIRST..pFiles.LAST  loop
+
+        v_arquivo      := utl_file.fopen(pDirectory, pFiles(i), 'R');
+       -- v_arquivo      := utl_file.fopen(pDirectory, 'safx262.csv', 'R');
+
+        loop
+            begin
+              utl_file.get_line(v_arquivo, v_linha);
+              v_linha := replace(v_linha, '"', '');
+
+               if v_linha not like '%COD_EMPRESA%' then
+
+                t_x262.cod_empresa    := SUBSTR(v_linha,1,(INSTR(v_linha, wDelimiter, 1, 1) - 1));
+                t_x262.cod_estab      := SUBSTR(v_linha,INSTR(v_linha, wDelimiter, 1, 1) + 1,(INSTR(v_linha, wDelimiter, 1, 2) - INSTR(v_linha, wDelimiter, 1, 1) - 1));
+                v_data_ini            := SUBSTR(v_linha,INSTR(v_linha, wDelimiter, 1, 2) + 1,(INSTR(v_linha, wDelimiter, 1, 3) - INSTR(v_linha, wDelimiter, 1, 2) - 1));
+                t_x262.data_ini_cons  := to_date(substr(v_data_ini, 7, 2) || '/' ||  substr(v_data_ini, 5, 2) || '/' || substr(v_data_ini, 1, 4), 'dd/mm/rrrr');
+                v_data_fim            := SUBSTR(v_linha,INSTR(v_linha, wDelimiter, 1, 3) + 1,(INSTR(v_linha, wDelimiter, 1, 4) - INSTR(v_linha, wDelimiter, 1, 3) - 1));
+                t_x262.data_fim_cons  := to_date(substr(v_data_fim, 7, 2) || '/' ||  substr(v_data_fim, 5, 2) || '/' || substr(v_data_fim, 1, 4), 'dd/mm/rrrr');
+                t_x262.cod_emp_part   := SUBSTR(v_linha,INSTR(v_linha, wDelimiter, 1, 4) + 1,(INSTR(v_linha, wDelimiter, 1, 5) - INSTR(v_linha, wDelimiter, 1, 4) - 1));
+               -- t_x262.grupo_conta    := SUBSTR(v_linha,INSTR(v_linha, wDelimiter, 1, 5) + 1,(INSTR(v_linha, wDelimiter, 1, 6) - INSTR(v_linha, wDelimiter, 1, 5) - 1));
+                t_x262.grupo_conta    := v_grupo;
+                t_x262.cod_conta      := SUBSTR(v_linha,INSTR(v_linha, wDelimiter, 1, 5) + 1,(INSTR(v_linha, wDelimiter, 1, 6) - INSTR(v_linha, wDelimiter, 1, 5) - 1));
+                t_x262.cod_conta_cons := trim(SUBSTR(v_linha,INSTR(v_linha, wDelimiter, 1, 6) + 1, 70));
+
+                -- alteracao para inserir dados na safx262
+                t_sx262.cod_empresa := t_x262.cod_empresa;
+                t_sx262.COD_ESTAB   := t_x262.cod_estab;
+                t_sx262.DATA_INI_CONS := to_char(t_x262.data_ini_cons,'yyyymmdd');
+                t_sx262.DATA_FIM_CONS := to_char(t_x262.data_fim_cons,'yyyymmdd');
+                t_sx262.COD_EMP_PART  := t_x262.cod_emp_part;
+                t_sx262.COD_CONTA     := t_x262.cod_conta;
+                t_sx262.DAT_GRAVACAO  := sysdate;
+                t_sx262.COD_CONTA_CONS  := t_x262.cod_conta_cons;
+
+                --
+                begin
+                  --insert into sped_contas_emp_cons values t_x262;
+                  insert into safx262 values t_sx262;
+
+                  if sql%rowcount > 0 then
+                     v_commit := v_commit + 1;
+                  end if;
+
+                  if v_commit = 1000 then
+                    commit;
+                    v_commit := 0;
+                  end if;
+                --
+                exception
+                  when others then
+                    v_error := 'Erro: ' || sqlerrm;
+                    LIB_PROC.add_log('Erro na carga do arquivo: ' || sqlerrm, 1);
+                end;
+                --
+             end if;
+            exception
+              when no_data_found then
+                utl_file.fclose(v_arquivo);
+                commit;
+                exit;
+            end;
+          end loop;
+
+        utl_file.fclose(v_arquivo);
+
+       end loop;
+    end if;
+    */
+
+/*
+    IF (pGeraSafx262Aglut = 'S') THEN
+
+       PRC_GER262_AGLUT(pExercicio);
+
+    NULL;
+
+    END IF;
+*/
 
 
      if (pCarregaCsvParam = 'S' and pDirectory is not null) THEN -- carga de parametros (contas detentoras e contrapartidas)
-       Begin
-         EXECUTE IMMEDIATE 'alter session set nls_numeric_characters = '',.''';
-         EXECUTE IMMEDIATE 'alter session set nls_date_format = ''dd/mm/yyyy''';
-         exception
-           when others then
-             lib_proc.add_log('Falha ao alterar sessao para nls_numeric e data_format '||SQLERRM,1);
-       end;
+
+     EXECUTE IMMEDIATE 'alter session set nls_numeric_characters = '',.''';
+     EXECUTE IMMEDIATE 'alter session set nls_date_format = ''dd/mm/yyyy''';
 
       for i IN pFiles.FIRST..pFiles.LAST  LOOP
 
@@ -533,11 +631,6 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
                 RETURN mproc_id;
 
         END;
-        
-      LIB_PROC.add_log(mproc_id || '  Processo ', 1);
-      LIB_PROC.CLOSE();
-
-      RETURN mproc_id;
 
     END;
 
@@ -551,7 +644,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM2_BLOCOK_CPROC IS
 
           mLinha := NULL;
           mLinha := LIB_STR.w(mLinha,
-                              'SAFX240 - Relaï¿½ï¿½o das Empresas Consolidadas;;;;;;;;;;;;;;;;;',
+                              'SAFX240 - Relação das Empresas Consolidadas;;;;;;;;;;;;;;;;;',
                               1);
           LIB_PROC.add(mLinha, null, null, ptipo);
 

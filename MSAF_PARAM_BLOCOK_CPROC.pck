@@ -2,12 +2,12 @@ CREATE OR REPLACE PACKAGE MSAF_PARAM_BLOCOK_CPROC IS
 
   --###########################################################################
   --## Autor    : Diego  Peres                                               ##
-  --## Criaï¿½?o  : 25/05/2020                                                 ##
+  --## Criaç?o  : 25/05/2020                                                 ##
   --## Empresa  : ATVI Consultoria                                           ##
-  --## Objetivo : PARAMETRO PARA GERAï¿½ï¿½O DO BLOCO K - ECD                    ##
+  --## Objetivo : PARAMETRO PARA GERAÇÃO DO BLOCO K - ECD                    ##
   --###########################################################################
 
-  -- Declaraï¿½?o de Variï¿½veis Pï¿½blicas */
+  /* Declaraç?o de Variáveis Públicas */
   vNome  estabelecimento.razao_social%TYPE;
 
   FUNCTION Parametros RETURN         VARCHAR2;
@@ -18,7 +18,6 @@ CREATE OR REPLACE PACKAGE MSAF_PARAM_BLOCOK_CPROC IS
   FUNCTION Modulo RETURN             VARCHAR2;
   FUNCTION Classificacao RETURN      VARCHAR2;
 
-
   FUNCTION Executar(pCodEmpConsol        VARCHAR2,
                     pPeriodo             varchar2,
                     pCodEmpDetent        VARCHAR2,
@@ -26,7 +25,6 @@ CREATE OR REPLACE PACKAGE MSAF_PARAM_BLOCOK_CPROC IS
                     pCodEmpContPart      VARCHAR2,
                     pCodContaContPart    VARCHAR2,
                     pIndElimin           varchar2,
-                    pUtilSaldo           varchar2,
                     pVlrElimin           varchar2,
                     pIndDCElimin         varchar2,
                     pTipo                Varchar2,
@@ -54,8 +52,7 @@ procedure dados_relatorio (vs_cod_empresa_cons     VARCHAR2
                           ,vs_AnoCompet        varchar2
                           ,vs_VlrElimin        varchar2
                           ,vs_IndElimin        varchar2
-                          ,vn_rel              number
-                          ,vs_utiliza_saldo    varchar2);
+                          ,vn_rel              number);
 
 
   END MSAF_PARAM_BLOCOK_CPROC;
@@ -64,9 +61,9 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
 
   --###########################################################################
   --## Autor    : Diego  Peres                                               ##
-  --## Criaï¿½?o  : 25/05/2020                                                 ##
+  --## Criaç?o  : 25/05/2020                                                 ##
   --## Empresa  : ATVI Consultoria                                           ##
-  --## Objetivo : PARAMETRO PARA GERAï¿½ï¿½O DO BLOCO K - ECD                    ##
+  --## Objetivo : PARAMETRO PARA GERAÇÃO DO BLOCO K - ECD                    ##
   --## Ajustes  :                                                            ##
   --##            001 - Felipe Guimaraes 21/04/2021                          ##
   --##            Permitir replicacao dos parametros de periodos anteriores  ##
@@ -99,12 +96,8 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
   FUNCTION Parametros RETURN VARCHAR2 IS
     pstr VARCHAR2(5000);
   BEGIN
-    BEGIN
-      EXECUTE IMMEDIATE 'alter session set nls_numeric_characters = '',.'' ';
-      exception
-        when others then
-          lib_proc.add_log('Falha ao alterar sessao para nls_numeric: '||SQLERRM,1);
-    end;
+
+   EXECUTE IMMEDIATE 'alter session set nls_numeric_characters = '',.'' ';
 
    musuario                      := LIB_PARAMETROS.Recuperar('USUARIO');
    mcod_empresa                  := LIB_PARAMETROS.RECUPERAR('EMPRESA');
@@ -145,7 +138,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
 
     -- :2
     Lib_Proc.Add_Param(Pstr,
-                       'Perï¿½odo',
+                       'Período',
                        'date',
                        'Textbox',
                        'S',
@@ -165,12 +158,12 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
                        NULL,
                        'SELECT distinct e.cod_emp_part,e.cod_emp_part  || '' - '' || e.nome_emp_part FROM x240_inf_empresa_cons e where e.cod_empresa = :1 and :2 between e.data_ini_cons and e.data_fim_cons ORDER BY  e.cod_emp_part ASC',
                        NULL,
-                       ':11 in (''1'',''2'')');
+                       ':10 in (''1'',''2'')');
 
 
     -- :4
     LIB_PROC.add_param(pstr,
-                       'Conta Contï¿½bil Detentora',
+                       'Conta Contábil Detentora',
                        'Varchar2',
                        'TextBox',
                        'N',
@@ -179,7 +172,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
                        'SELECT distinct V.COD_CONTA, V.DESCRICAO FROM X2002_PLANO_CONTAS V  WHERE V.IND_CONTA = ''A'' AND V.IND_SITUACAO = ''A''
                              AND V.GRUPO_CONTA = '''||v_grupo||''' AND V.VALID_CONTA = (SELECT MAX(A.VALID_CONTA) FROM X2002_PLANO_CONTAS A  WHERE A.COD_CONTA = V.COD_CONTA AND A.GRUPO_CONTA = '''||v_grupo||''') ORDER BY V.COD_CONTA ASC',
                        NULL,
-                       ':11 in (''1'',''2'')');
+                       ':10 in (''1'',''2'')');
 
 
     -- :5
@@ -192,12 +185,12 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
                        NULL,
                        'SELECT distinct e.cod_emp_part,e.cod_emp_part  || '' - '' || e.nome_emp_part FROM x240_inf_empresa_cons e where e.cod_empresa = :1 and :2 between e.data_ini_cons and e.data_fim_cons ORDER BY  e.cod_emp_part ASC',
                        null,
-                       ':11 in (''1'',''2'')'
+                       ':10 in (''1'',''2'')'
                        );
 
     -- :6
     LIB_PROC.add_param(pstr,
-                       'Conta Contï¿½bil Contra-Partida',
+                       'Conta Contábil Contra-Partida',
                        'Varchar2',
                        'TextBox',
                        'N',
@@ -206,14 +199,14 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
                        'SELECT distinct V.COD_CONTA, V.DESCRICAO FROM X2002_PLANO_CONTAS V  WHERE V.IND_CONTA = ''A'' AND V.IND_SITUACAO = ''A''
                              AND V.GRUPO_CONTA = '''||v_grupo||''' AND V.VALID_CONTA = (SELECT MAX(A.VALID_CONTA) FROM X2002_PLANO_CONTAS A  WHERE A.COD_CONTA = V.COD_CONTA AND A.GRUPO_CONTA = '''||v_grupo||''') ORDER BY V.COD_CONTA ASC',
                        null,
-                       ':11 in (''1'',''2'')'
+                       ':10 in (''1'',''2'')'
                        );
 
 
 
     -- :7
     LIB_PROC.add_param(pstr,
-                       'Informar Eliminaï¿½ï¿½es',
+                       'Informar Eliminações',
                        'Varchar2',
                        'CheckBox',
                        'N',
@@ -221,24 +214,11 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
                         null,
                         NULL,
                         NULL,
-                        ':11 in (''1'',''2'')');
-                        
+                        ':10 in (''1'',''2'')');
+
     -- :8
-    lib_proc.add_param(pparam      => pstr,
-                       ptitulo     => 'Utilizar saldo final',
-                       ptipo       => 'varchar2',
-                       pcontrole   => 'checkbox',
-                       pmandatorio => 'S',
-                       pdefault    => 'N',
-                       pmascara    => null,
-                       pvalores    => null,
-                       papresenta  => 'S',
-                       phabilita   => ':11 in (''1'',''2'')');
-
-
-    -- :9
     Lib_Proc.Add_Param(Pstr,
-                       'Valor Eliminaï¿½ï¿½o',
+                       'Valor Eliminação',
                        'varchar2',
                        'Textbox',
                        'N',
@@ -247,9 +227,9 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
                       -- null,
                        null,
                        null,
-                       ':11 in (''1'',''2'') and :7 = ''S''');
+                       ':10 in (''1'',''2'') and :7 = ''S''');
 
-    -- :10
+    -- :9
     Lib_Proc.Add_Param(Pstr,
                        'Indicador Debito/Credito',
                        'Varchar2',
@@ -260,20 +240,20 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
                         'select ''D'',''D - Debito'' from dual union all
                          select ''C'',''C - Credito'' from dual order by 1',
                        null,
-                       ':11 in (''1'',''2'') and :7 = ''S'''
+                       ':10 in (''1'',''2'') and :7 = ''S'''
                          );
 
-    -- :11
+    -- :10
     LIB_PROC.add_param(pstr,
-                       'Operaï¿½ï¿½o',
+                       'Operação',
                        'Varchar2',
                        'radiobutton',
                        'S',
                         '3',
                         null,
-                        '1=Incluir,' || '2=Excluir,' || '3=Relatï¿½rio Conferï¿½ncia,' || '4=Replicar parï¿½metros do periodo anterior');
+                        '1=Incluir,' || '2=Excluir,' || '3=Relatório Conferência,' || '4=Replicar parâmetros do periodo anterior');
 
-    -- :12
+    -- :11
     LIB_PROC.add_param(pstr,
                        'Parametros Cadastrados',
                        'Varchar2',
@@ -289,7 +269,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
 
   FUNCTION Nome RETURN VARCHAR2 IS
   BEGIN
-    RETURN '3.0 - Parametro Geraï¿½ï¿½o do Bloco K - ECD';
+    RETURN '3.0 - Parametro Geração do Bloco K - ECD';
   END Nome;
 
   FUNCTION Tipo RETURN VARCHAR2 IS
@@ -304,7 +284,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
 
   FUNCTION Descricao RETURN VARCHAR2 IS
   BEGIN
-    RETURN 'Parametro Para Cadastro das Regras de Consolidaï¿½ï¿½o para Geraï¿½ï¿½o do Bloco K - ECD';
+    RETURN 'Parametro Para Cadastro das Regras de Consolidação para Geração do Bloco K - ECD';
   END;
 
   FUNCTION Modulo RETURN VARCHAR2 IS
@@ -325,107 +305,107 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
                     pCodEmpContPart      VARCHAR2,
                     pCodContaContPart    VARCHAR2,
                     pIndElimin           varchar2,
-                    pUtilSaldo           varchar2,
                     pVlrElimin           varchar2,
                     pIndDCElimin         varchar2,
                     pTipo                Varchar2,
                     pRegistro            lib_proc.varTab
                     ) RETURN INTEGER IS
 
-    -- Variaveis de Trabalho */
+    /* Variaveis de Trabalho */
     mproc_id          INTEGER;
-    --mLinha            VARCHAR2(1000);
-    --v_tipo            varchar2(100);
+    mLinha            VARCHAR2(1000);
+    v_tipo            varchar2(100);
     mcod_empresa      varchar2(100); --empresa.cod_empresa%type;
-    --v_result          varchar2(10) := null;
-    v_rowid           varchar2(50);
+    v_result          varchar2(10) := null;
+    v_rowid           varchar2(50) := null;
     vn_rel            number:=1;
     vs_nome_interface varchar2(300);
     vs_nome_rel       varchar2(3000);
     vs_processo       varchar2(100);
     v_count           number:=0;
-    vs_msg            varchar2(200);
-    --v_ind_ext         varchar2(1) := null;
-    --v_movto           varchar2(1) :=null;
+    vs_msg            varchar2(200):=null;
+    v_ind_ext         char(1) := null;
+    v_movto           char(1) :=null;
 
     vVlrElimin        number :=0;
 
     v_finalizar       number := 0;
 
-    --Status_w         INTEGER;
+    Status_w         INTEGER;
     RazaoEmp_w       EMPRESA.RAZAO_SOCIAL%TYPE;
     RazaoEst_w       ESTABELECIMENTO.RAZAO_SOCIAL%TYPE;
     CGC_w            ESTABELECIMENTO.CGC%TYPE;
-    --Ind_Atividade_w  ESTABELECIMENTO.Ind_Atividade%type;
-    --IndConvIcms_w    ESTABELECIMENTO.IND_CONV_ICMS%TYPE;
-    --CodAtividade_w   ESTABELECIMENTO.COD_ATIVIDADE%TYPE;
-    --UF_estab_w       ESTADO.COD_ESTADO%TYPE;
+    Ind_Atividade_w  ESTABELECIMENTO.Ind_Atividade%type;
+    IndConvIcms_w    ESTABELECIMENTO.IND_CONV_ICMS%TYPE;
+    CodAtividade_w   ESTABELECIMENTO.COD_ATIVIDADE%TYPE;
+    UF_estab_w       ESTADO.COD_ESTADO%TYPE;
     linha_log       varchar2(100);
 
-    --Finalizar EXCEPTION;
+    Finalizar EXCEPTION;
 
 
   BEGIN
-    BEGIN
 
-      mproc_id := LIB_PROC.new('MSAF_PARAM_BLOCOK_CPROC');
-      LIB_PROC.add_log('Log gerado', 1);
+
+      BEGIN
+
+            mproc_id := LIB_PROC.new('MSAF_PARAM_BLOCOK_CPROC');
+            LIB_PROC.add_log('Log gerado', 1);
         --    Mcod_Empresa := Pcod_empresa; --Lib_Parametros.Recuperar('EMPRESA');
 
 
-     /**************************************************
-     Inclui Header/Footer do Log de Erros            
-     **************************************************/
-      lib_proc.Add_Log(RazaoEmp_w, 0);
-     --   lib_proc.Add_Log('Filial: ' || Pcod_Estab || ' - ' || RazaoEst_w, 0);
-     --   lib_proc.Add_Log('CNPJ: '   || CGC_w, 0);
-      lib_proc.Add_Log('.                                                                                                          Relatï¿½rio de Log', 0);
-     --  lib_proc.Add_Log('.                                                                                               Dt.Ini : ' ||
-     --      to_date(pData_Ini,'DD/MM/YYYY') || '  -  Dt.Fim: ' ||to_date(pData_Fim,'DD/MM/YYYY') , 0);
+    /***************************************************/
+    /* Inclui Header/Footer do Log de Erros            */
+    /***************************************************/
+    lib_proc.Add_Log(RazaoEmp_w, 0);
+ --   lib_proc.Add_Log('Filial: ' || Pcod_Estab || ' - ' || RazaoEst_w, 0);
+ --   lib_proc.Add_Log('CNPJ: '   || CGC_w, 0);
+    lib_proc.Add_Log('.                                                                                                          Relatório de Log', 0);
+  --  lib_proc.Add_Log('.                                                                                               Dt.Ini : ' ||
+    --               to_date(pData_Ini,'DD/MM/YYYY') || '  -  Dt.Fim: ' ||to_date(pData_Fim,'DD/MM/YYYY') , 0);
 
-      linha_log := 'Log de Processo: '||mproc_id;
-      lib_proc.Add_Log('.                                                                                                        '||linha_log, 0);
+    linha_log := 'Log de Processo: '||mproc_id;
+    lib_proc.Add_Log('.                                                                                                        '||linha_log, 0);
 
 
-      lib_proc.Add_Log(rpad('-', 200, '-'), 0);
-      lib_proc.Add_Log(' ', 0);
+    lib_proc.Add_Log(rpad('-', 200, '-'), 0);
+    lib_proc.Add_Log(' ', 0);
 
-     /**************************************************************
-     Validaï¿½ï¿½o de datas inicial e final informadas com parï¿½metro 
-     **************************************************************/
+    /***************************************************************/
+    /* Validação de datas inicial e final informadas com parâmetro */
+    /***************************************************************/
 
-      if pTipo = '1' then
+    if pTipo = '1' then
 
         If pCodEmpConsol is null Then
-           lib_proc.Add_Log('Erro: A Empresa Consolidadora deve ser informada para Inclusï¿½o.', 0);
+           lib_proc.Add_Log('Erro: A Empresa Consolidadora deve ser informada para Inclusão.', 0);
            lib_proc.Add_Log(' ', 0);
            v_finalizar := v_finalizar + 1;
         End If;
 
         If pCodEmpDetent is null Then
-           lib_proc.Add_Log('Erro: A Empresa Detentora dos valores deve ser informada para Inclusï¿½o.', 0);
+           lib_proc.Add_Log('Erro: A Empresa Detentora dos valores deve ser informada para Inclusão.', 0);
            lib_proc.Add_Log(' ', 0);
            v_finalizar := v_finalizar + 1;
         End If;
 
         If pCodContaDet is null Then
-           lib_proc.Add_Log('Erro: O campo Cï¿½digo da Conta Contï¿½bil da Empresa Detentora dos valores deve ser informado para Inclusï¿½o.', 0);
+           lib_proc.Add_Log('Erro: O campo Código da Conta Contábil da Empresa Detentora dos valores deve ser informado para Inclusão.', 0);
            lib_proc.Add_Log(' ', 0);
            v_finalizar := v_finalizar + 1;
         End If;
 
-        If pCodEmpContPart is null and pUtilSaldo = 'N' Then
-           lib_proc.Add_Log('Erro: A Empresa Contra-Partida dos valores deve ser informada para Inclusï¿½o.', 0);
+        If pCodEmpContPart is null Then
+           lib_proc.Add_Log('Erro: A Empresa Contra-Partida dos valores deve ser informada para Inclusão.', 0);
            lib_proc.Add_Log(' ', 0);
            v_finalizar := v_finalizar + 1;
         End If;
 
-        If pCodContaContPart is null and pUtilSaldo = 'N' Then
-           lib_proc.Add_Log('Erro: O campo Cï¿½digo da Conta Contï¿½bil da Empresa Contra-Partida dos valores deve ser informado para Inclusï¿½o.', 0);
+        If pCodContaContPart is null Then
+           lib_proc.Add_Log('Erro: O campo Código da Conta Contábil da Empresa Contra-Partida dos valores deve ser informado para Inclusão.', 0);
            lib_proc.Add_Log(' ', 0);
            v_finalizar := v_finalizar + 1;
         End If;
-
 
 
         if pIndElimin = 'S' then
@@ -433,14 +413,14 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
            vVlrElimin :=  to_number(nvl(pVlrElimin, 0));
           exception
             when others then
-                 lib_proc.Add_Log('Erro: O campo Valor da Eliminaï¿½ï¿½o deve ser nï¿½merico.', 0);
+                 lib_proc.Add_Log('Erro: O campo Valor da Eliminação deve ser númerico.', 0);
                  lib_proc.Add_Log(' ', 0);
                  v_finalizar := v_finalizar + 1;
            end;
         end if;
 
           if pPeriodo is null then
-             lib_proc.Add_Log('Erro: A competï¿½ncia deve ser informado para Inclusï¿½o.', 0);
+             lib_proc.Add_Log('Erro: A competência deve ser informado para Inclusão.', 0);
              lib_proc.Add_Log(' ', 0);
              v_finalizar := v_finalizar + 1;
 
@@ -452,25 +432,24 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
             RETURN mproc_id;
         end if;
 
-      end if;
 
-      LIB_PROC.add_tipo(mproc_id, vn_rel, 'ECD_BLOCOK', 3,48,150, '8', 'Relatorio');
 
-      vs_nome_rel := 'Bloco K - ECD';
-      vs_nome_interface := 'Parï¿½metro para Determinar o Critï¿½rio de Consolidaï¿½ï¿½o das Interfaces SAFX242, SAFX243 e SAFX244';
 
-      if pTipo = '1' then
-        begin
-          INSERT INTO MSAF_PARAM_BLOCOK_ECD
-                                    (COD_EMPRESA_CONS,
-                                      COD_EMPRESA_DET,
-                                      COD_CONTA_DET,
-                                      COD_EMPRESA_CONTRA,
-                                      COD_CONTA_CONTRA,
-                                      PERIODO,
-                                      VLR_ELIMINACAO,
-                                      IND_DC_VLR_ELIM,
-                                      IND_UTILIZA_SALDO_FIM)
+    end if;
+
+
+
+--    end if;
+    LIB_PROC.add_tipo(mproc_id, vn_rel, 'ECD_BLOCOK', 3,48,150, '8', 'Relatorio');
+
+    vs_nome_rel := 'Bloco K - ECD';
+    vs_nome_interface := 'Parâmetro para Determinar o Critério de Consolidação das Interfaces SAFX242, SAFX243 e SAFX244';
+
+
+              if pTipo = '1' then
+
+                  begin
+                          INSERT INTO MSAF_PARAM_BLOCOK_ECD
                                     VALUES
                                       ( pCodEmpConsol,
                                         pCodEmpDetent,
@@ -479,22 +458,22 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
                                         pCodContaContPart,
                                         last_day(pPeriodo),
                                         nvl(vVlrElimin, 0),
-                                        pIndDCElimin,
-                                        pUtilSaldo
+                                        pIndDCElimin
                                        );
 
-          --LIB_PROC.add_log('PARAMETRO INCLUIDO COM SUCESSO', 1);
-          vs_msg := 'Inclusï¿½o realizada com sucesso';
-          exception
-            when DUP_VAL_ON_INDEX then
-              vs_msg := 'Conta Detentora e Conta Contra-Partida jï¿½ cadastrada para esta empresa Consolidadora';
-              --LIB_PROC.add_log('Conta Detentora e Conta Contra-Partida jï¿½ cadastrada para esta empresa Consolidadora', 1);
+                 --    LIB_PROC.add_log('PARAMETRO INCLUIDO COM SUCESSO', 1);
+                      vs_msg := 'Inclusão realizada com sucesso';
 
-          begin
-            update MSAF_PARAM_BLOCOK_ECD k
+                      exception
+                         when DUP_VAL_ON_INDEX then
+
+                             vs_msg := 'Conta Detentora e Conta Contra-Partida já cadastrada para esta empresa Consolidadora';
+                             --LIB_PROC.add_log('Conta Detentora e Conta Contra-Partida já cadastrada para esta empresa Consolidadora', 1);
+
+                            begin
+                              update MSAF_PARAM_BLOCOK_ECD k
                                 SET k.vlr_eliminacao       = nvl(vVlrElimin, 0)
                                    ,k.ind_dc_vlr_elim      = pIndDCElimin
-                                   ,k.ind_utiliza_saldo_fim = pUtilSaldo
                               where 1=1
                                 and k.cod_empresa_cons  = pCodEmpConsol
                                 and k.periodo           = last_day(pPeriodo)
@@ -503,39 +482,43 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
                                 AND k.cod_empresa_contra  = pCodEmpContPart
                                 AND k.cod_conta_contra    = pCodContaContPart;
 
-            LIB_PROC.add_log('PARAMETRO Atualizado', 1);
-            vs_msg := 'Parametro atualizado';
-            exception
-              when others then
-                raise_application_error(-20102, 'Nao foi possivel Atualizar o Registro, Verificar os dados' || sqlerrm);
-          end;
+                             LIB_PROC.add_log('PARAMETRO Atualizado', 1);
+                             vs_msg := 'Parametro atualizado';
 
-          when OTHERS then
-            raise_application_error(-20102, 'Nao foi possivel Inserir o Registro, Verificar os dados' || sqlerrm);
+                             exception
+                                when others then
+                                   raise_application_error(-20102, 'Nao foi possivel Atualizar o Registro, Verificar os dados' || sqlerrm);
+                             end;
 
-        end;
+                         when OTHERS then
+                            raise_application_error(-20102, 'Nao foi possivel Inserir o Registro, Verificar os dados' || sqlerrm);
+                      end;
 
 
-        LIB_PROC.add_log('PARAMETRO INCLUIDO COM SUCESSO', 1);
-        -- ### RELATORIO - HTML
-        vs_processo       := 'Inclusï¿½o';
-        cabecalho(vs_nome_rel
+                LIB_PROC.add_log('PARAMETRO INCLUIDO COM SUCESSO', 1);
+
+            -- ### RELATORIO - HTML
+             vs_processo       := 'Inclusão';
+
+             cabecalho(vs_nome_rel
                              ,vn_rel
                              ,RazaoEst_w
                              ,CGC_w
                              ,vs_processo
                              ,vs_nome_interface
                              );
-         /*dados_relatorio(vs_cod_empresa1 => pCodEmpConsol,
+/*
+             dados_relatorio(vs_cod_empresa1 => pCodEmpConsol,
                                    vs_conta1 => pCodContaDet,
                                    vs_cod_empresa2 => pCodEmpDetent,
                                    vs_conta2 => pCodContaDet,
                                    vs_AnoCompet => pAnoCompetencia,
                                    vs_VlrElimin => form_vlr(nvl(vVlrElimin,0)),
                                    vs_IndElimin => pIndDCElimin,
-                                   vn_rel => vn_rel);    */
+                                   vn_rel => vn_rel);
+*/
 
-        dados_relatorio(vs_cod_empresa_cons   => pCodEmpConsol,
+             dados_relatorio(vs_cod_empresa_cons   => pCodEmpConsol,
                              vs_cod_empresa_det    => pCodEmpDetent,
                              vs_conta_det          => pCodContaDet,
                              vs_cod_empresa_contra => pCodEmpContPart,
@@ -543,22 +526,23 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
                              vs_AnoCompet          => to_char(to_date(pPeriodo),'mm/yyyy'),
                              vs_VlrElimin          => nvl(vVlrElimin, 0),
                              vs_IndElimin          => pIndDCElimin,
-                             vn_rel                => vn_rel,
-                             vs_utiliza_saldo      => pUtilSaldo);
+                             vn_rel                => vn_rel);
 
 
-        MONTA_LINHA('<tr>',vn_rel);
-        MONTA_LINHA('<td colspan="4" rowspan="1"',vn_rel);
-        MONTA_LINHA('style="vertical-align: top; font-weight: bold; text-align: center; color: #85929E; font-size: 16px;"> '||vs_msg || '<br>',vn_rel);
-        MONTA_LINHA('</td>',vn_rel);
+                MONTA_LINHA('<tr>',vn_rel);
+                MONTA_LINHA('<td colspan="4" rowspan="1"',vn_rel);
+                MONTA_LINHA('style="vertical-align: top; font-weight: bold; text-align: center; color: #85929E; font-size: 16px;"> '||vs_msg || '<br>',vn_rel);
+                MONTA_LINHA('</td>',vn_rel);
 
 
 
-      elsif pTipo = '2' then
-        -- ### RELATORIO - HTML
-        vs_processo       := ' Exclusï¿½o';
+               elsif pTipo = '2' then
 
-        cabecalho(vs_nome_rel
+
+                             -- ### RELATORIO - HTML
+             vs_processo       := ' Exclusão';
+
+             cabecalho(vs_nome_rel
                              ,vn_rel
                              ,RazaoEst_w
                              ,CGC_w
@@ -566,34 +550,39 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
                              ,vs_nome_interface
                              );
 
-        FOR pCursorRel IN pRegistro.FIRST..pRegistro.LAST LOOP
-          for mreg in (
+              FOR pCursorRel IN pRegistro.FIRST..pRegistro.LAST LOOP
+
+              for mreg in (
                          select p.rowid rowid_param, p.*
                          from MSAF_PARAM_BLOCOK_ECD p
                          where  p.rowid  = pRegistro(pCursorRel)
                          ) loop
-            begin
-              v_count := v_count + 1;
 
-              delete from MSAF_PARAM_BLOCOK_ECD k
-              where k.rowid       = mreg.rowid_param;
+                      begin
 
-              IF SQL%NOTFOUND THEN
-                LIB_PROC.add_log('Dados nï¿½o encontrados para exclusï¿½o', 1);
+                              v_count := v_count + 1;
+                              delete from MSAF_PARAM_BLOCOK_ECD k
+                              where k.rowid       = mreg.rowid_param;
 
-              ELSE
-                LIB_PROC.add_log('Exclusï¿½o Realizada!', 1);
 
-                /*dados_relatorio(vs_cod_empresa1 => mreg.cod_empresa_cons,
+                        IF SQL%NOTFOUND THEN
+                            LIB_PROC.add_log('Dados não encontrados para exclusão', 1);
+
+                        ELSE
+                           LIB_PROC.add_log('Exclusão Realizada!', 1);
+
+/*
+             dados_relatorio(vs_cod_empresa1 => mreg.cod_empresa_cons,
                                    vs_conta1 => mreg.cod_conta_det,
                                    vs_cod_empresa2 => mreg.cod_empresa_det,
                                    vs_conta2 => mreg.cod_conta_contr_part,
                                    vs_AnoCompet => mreg.ano_competencia,
                                    vs_VlrElimin => form_vlr(mreg.vlr_eliminacao),
                                    vs_IndElimin => mreg.ind_dc_vlr_elim,
-                                   vn_rel => vn_rel);*/
+                                   vn_rel => vn_rel);
+*/
 
-                dados_relatorio(vs_cod_empresa_cons   => mreg.cod_empresa_cons,
+             dados_relatorio(vs_cod_empresa_cons   => mreg.cod_empresa_cons,
                              vs_cod_empresa_det    => mreg.cod_empresa_det,
                              vs_conta_det          => mreg.cod_conta_det,
                              vs_cod_empresa_contra => mreg.cod_empresa_contra,
@@ -601,41 +590,45 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
                              vs_AnoCompet          => to_char(to_date(pPeriodo),'mm/yyyy'),
                              vs_VlrElimin          => form_vlr(mreg.vlr_eliminacao),
                              vs_IndElimin          => mreg.ind_dc_vlr_elim,
-                             vn_rel                => vn_rel,
-                             vs_utiliza_saldo      => mreg.ind_utiliza_saldo_fim);
-
-              END IF;
+                             vn_rel                => vn_rel);
 
 
-              exception
-                when NO_DATA_FOUND then
-                  LIB_PROC.add_log('Dados nï¿½o encontrados para exclusï¿½o', 1);
-                  v_rowid := null;
-                when OTHERS then
-                  raise_application_error(-20102, 'Nao foi possivel Localizar o registro, Verificar os dados');
-                  v_rowid := null;
 
-            end;
-          end loop;
-        end loop;
 
-        if  v_count > 0 then
-          MONTA_LINHA('<tr>',vn_rel);
-          MONTA_LINHA('<td colspan="4" rowspan="1"',vn_rel);
-          MONTA_LINHA('style="vertical-align: top; font-weight: bold; text-align: center; color: #85929E;font-size: 16px;"> Exclusï¿½o realizada com sucesso !!! <br>',vn_rel);
-          MONTA_LINHA('</td>',vn_rel);
-        else
-          MONTA_LINHA('<tr>',vn_rel);
-          MONTA_LINHA('<td colspan="4" rowspan="1"',vn_rel);
-          MONTA_LINHA('style="vertical-align: top; font-weight: bold; text-align: center; color: #85929E; font-size: 16px;"> Dados nï¿½o localizados para exclusï¿½o !!! <br>',vn_rel);
-          MONTA_LINHA('</td>',vn_rel);
-        end if;
+                        END IF;
 
-      elsif pTipo = '3' then
-        -- ### RELATORIO - HTML
-        vs_processo       := ' Relatï¿½rio Conferï¿½ncia';
 
-        cabecalho(vs_nome_rel
+                      exception
+                         when NO_DATA_FOUND then
+                            LIB_PROC.add_log('Dados não encontrados para exclusão', 1);
+                            v_rowid := null;
+                         when OTHERS then
+                            raise_application_error(-20102, 'Nao foi possivel Localizar o registro, Verificar os dados');
+                            v_rowid := null;
+                      end;
+
+                   end loop;
+                  end loop;
+
+                   if  v_count > 0 then
+                        MONTA_LINHA('<tr>',vn_rel);
+                        MONTA_LINHA('<td colspan="4" rowspan="1"',vn_rel);
+                        MONTA_LINHA('style="vertical-align: top; font-weight: bold; text-align: center; color: #85929E;font-size: 16px;"> Exclusão realizada com sucesso !!! <br>',vn_rel);
+                        MONTA_LINHA('</td>',vn_rel);
+                   else
+                        MONTA_LINHA('<tr>',vn_rel);
+                        MONTA_LINHA('<td colspan="4" rowspan="1"',vn_rel);
+                        MONTA_LINHA('style="vertical-align: top; font-weight: bold; text-align: center; color: #85929E; font-size: 16px;"> Dados não localizados para exclusão !!! <br>',vn_rel);
+                        MONTA_LINHA('</td>',vn_rel);
+
+                   end if;
+
+              elsif pTipo = '3' then
+
+                             -- ### RELATORIO - HTML
+             vs_processo       := ' Relatório Conferência';
+
+             cabecalho(vs_nome_rel
                              ,vn_rel
                              ,RazaoEst_w
                              ,CGC_w
@@ -643,56 +636,60 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
                              ,vs_nome_interface
                              );
 
-        LIB_PROC.add_log('Relatï¿½rio Conferï¿½ncia!', 1);
+               LIB_PROC.add_log('Relatório Conferência!', 1);
 
-        for mreg in (select p.rowid as rowid_param, p.*
+              for mreg in (
+                         select p.rowid rowid_param, p.*
                          from MSAF_PARAM_BLOCOK_ECD p
                          where  p.cod_empresa_cons = pCodEmpConsol
                            and p.periodo = last_day(pPeriodo)
                          ) loop
 
-          v_count := v_count + 1;
-           /*dados_relatorio(vs_cod_empresa1 => mreg.cod_empresa_cons,
+                         v_count := v_count + 1;
+/*
+                           dados_relatorio(vs_cod_empresa1 => mreg.cod_empresa_cons,
                                    vs_conta1 => mreg.cod_conta_det,
                                    vs_cod_empresa2 => mreg.cod_empresa_det,
                                    vs_conta2 => mreg.cod_conta_contr_part,
                                    vs_AnoCompet => mreg.ano_competencia,
                                    vs_VlrElimin => form_vlr(mreg.vlr_eliminacao),
                                    vs_IndElimin => mreg.ind_dc_vlr_elim,
-                                   vn_rel => vn_rel);*/
+                                   vn_rel => vn_rel);
+*/
 
-          dados_relatorio(vs_cod_empresa_cons   => mreg.cod_empresa_cons,
-                          vs_cod_empresa_det    => mreg.cod_empresa_det,
-                          vs_conta_det          => mreg.cod_conta_det,
-                          vs_cod_empresa_contra => mreg.cod_empresa_contra,
-                          vs_conta_contra       => mreg.cod_conta_contra,
-                          vs_AnoCompet          => to_char(to_date(pPeriodo),'mm/yyyy'),
-                          vs_VlrElimin          => form_vlr(mreg.vlr_eliminacao),
-                          vs_IndElimin          => mreg.ind_dc_vlr_elim,
-                          vn_rel                => vn_rel,
-                          vs_utiliza_saldo      => mreg.ind_utiliza_saldo_fim);
+                           dados_relatorio(vs_cod_empresa_cons   => mreg.cod_empresa_cons,
+                                           vs_cod_empresa_det    => mreg.cod_empresa_det,
+                                           vs_conta_det          => mreg.cod_conta_det,
+                                           vs_cod_empresa_contra => mreg.cod_empresa_contra,
+                                           vs_conta_contra       => mreg.cod_conta_contra,
+                                           vs_AnoCompet          => to_char(to_date(pPeriodo),'mm/yyyy'),
+                                           vs_VlrElimin          => form_vlr(mreg.vlr_eliminacao),
+                                           vs_IndElimin          => mreg.ind_dc_vlr_elim,
+                                           vn_rel                => vn_rel);
 
-        end loop;
+                  end loop;
 
 
-        if  v_count > 0 then
+                   if  v_count > 0 then
                         MONTA_LINHA('<tr>',vn_rel);
                         MONTA_LINHA('<td colspan="3" rowspan="1"',vn_rel);
-                        MONTA_LINHA('style="vertical-align: top; font-weight: bold; text-align: center; color: #85929E;font-size: 16px;"> Relatï¿½rio gerado com sucesso !!! <br>',vn_rel);
+                        MONTA_LINHA('style="vertical-align: top; font-weight: bold; text-align: center; color: #85929E;font-size: 16px;"> Relatório gerado com sucesso !!! <br>',vn_rel);
                         MONTA_LINHA('</td>',vn_rel);
-        else
+                   else
                         MONTA_LINHA('<tr>',vn_rel);
                         MONTA_LINHA('<td colspan="3" rowspan="1"',vn_rel);
-                        MONTA_LINHA('style="vertical-align: top; font-weight: bold; text-align: center; color: #85929E; font-size: 16px;"> Dados nï¿½o localizados !!! <br>',vn_rel);
+                        MONTA_LINHA('style="vertical-align: top; font-weight: bold; text-align: center; color: #85929E; font-size: 16px;"> Dados não localizados !!! <br>',vn_rel);
                         MONTA_LINHA('</td>',vn_rel);
 
-        end if;
+                   end if;
 
-       -- 001 Inicio
-      elsif pTipo = '4' THEN -- replicar parametros do periodo anterior
-        BEGIN
-          FOR reg IN (SELECT * FROM MSAF_PARAM_BLOCOK_ECD WHERE periodo = '31/12/'|| (to_char(to_date(pPeriodo),'yyyy')-1) )
-            LOOP
+-- 001 Inicio
+              elsif pTipo = '4' THEN -- replicar parametros do periodo anterior
+
+                BEGIN
+
+                 FOR reg IN (SELECT * FROM MSAF_PARAM_BLOCOK_ECD WHERE periodo = '31/12/'|| (to_char(to_date(pPeriodo),'yyyy')-1) )
+                   LOOP
                      INSERT INTO MSAF_PARAM_BLOCOK_ECD(COD_EMPRESA_CONS,
                                                        COD_EMPRESA_DET,
                                                        COD_CONTA_DET,
@@ -700,8 +697,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
                                                        COD_CONTA_CONTRA,
                                                        PERIODO,
                                                        VLR_ELIMINACAO,
-                                                       IND_DC_VLR_ELIM,
-                                                       ind_utiliza_saldo_fim)
+                                                       IND_DC_VLR_ELIM)
                                                        VALUES
                                                        (reg.cod_empresa_cons,
                                                         reg.cod_empresa_det,
@@ -710,32 +706,28 @@ CREATE OR REPLACE PACKAGE BODY MSAF_PARAM_BLOCOK_CPROC IS
                                                         reg.cod_conta_contra,
                                                         last_day(pPeriodo),
                                                         0,
-                                                        NULL,
-                                                        reg.ind_utiliza_saldo_fim);
-          END LOOP;
+                                                        NULL);
+                   END LOOP;
 
-          COMMIT;
+                   COMMIT;
 
-          EXCEPTION 
-            WHEN OTHERS THEN
-              lib_proc.add_log('Erro ao replicar parametros do periodo anterior: '||SQLERRM||' - '||dbms_utility.format_error_stack,1);
-              lib_proc.add_log('Erro ao replicar parametros do periodo anterior: '||SQLERRM||' - '||dbms_utility.format_error_backtrace,1);
+                 EXCEPTION WHEN
+                   OTHERS THEN
+                   lib_proc.add_log('Erro ao replicar parametros do periodo anterior: '||SQLERRM||' - '||dbms_utility.format_error_backtrace,1);
+                END;
+
+-- 001 Fim
+              end if;
+
+              final_html(vn_rel);
+
+              LIB_PROC.add_log(mproc_id || '  Processo ', 1);
+              LIB_PROC.CLOSE();
+
+        RETURN mproc_id;
+
         END;
-
-         -- 001 Fim
-      end if;
-
-      final_html(vn_rel);
-
-      --LIB_PROC.add_log(mproc_id || '  Processo ', 1);
-      --LIB_PROC.CLOSE();
-      --RETURN mproc_id;
-
     END;
-    LIB_PROC.add_log(mproc_id || '  Processo ', 1);
-    LIB_PROC.CLOSE();
-    RETURN mproc_id;
-  END;
 
 
 PROCEDURE MONTA_LINHA (PS_LINHA IN VARCHAR2, vn_rel number) IS
@@ -759,7 +751,7 @@ procedure cabecalho(ps_nome_rel            varchar2
     MONTA_LINHA('<head>',vn_rel);
     MONTA_LINHA('<meta content="text/html; charset=ISO-8859-1"',vn_rel);
     MONTA_LINHA('http-equiv="content-type">',vn_rel);
-    MONTA_LINHA('<title>Relatï¿½rio de execuï¿½ï¿½o</title>',vn_rel);
+    MONTA_LINHA('<title>Relatório de execução</title>',vn_rel);
     MONTA_LINHA('</head>',vn_rel);
     MONTA_LINHA('<body>',vn_rel);
     MONTA_LINHA('<span style="text-decoration: underline;"></span>',vn_rel);
@@ -806,7 +798,7 @@ procedure cabecalho(ps_nome_rel            varchar2
     MONTA_LINHA('</td>',vn_rel);
 
     MONTA_LINHA('<td',vn_rel);
-    MONTA_LINHA('style="vertical-align: top; width: 400px; background-color: #0088ff; font-weight: bold; text-align: center;">Conta Contï¿½bil Detentora<br>',vn_rel);
+    MONTA_LINHA('style="vertical-align: top; width: 400px; background-color: #0088ff; font-weight: bold; text-align: center;">Conta Contábil Detentora<br>',vn_rel);
     MONTA_LINHA('</td>',vn_rel);
 
     MONTA_LINHA('<td',vn_rel);
@@ -814,19 +806,15 @@ procedure cabecalho(ps_nome_rel            varchar2
     MONTA_LINHA('</td>',vn_rel);
 
     MONTA_LINHA('<td',vn_rel);
-    MONTA_LINHA('style="vertical-align: top; width: 400px; background-color: #0088ff; font-weight: bold; text-align: center;">Conta Contï¿½bil Contra-Partida<br>',vn_rel);
+    MONTA_LINHA('style="vertical-align: top; width: 400px; background-color: #0088ff; font-weight: bold; text-align: center;">Conta Contábil Contra-Partida<br>',vn_rel);
     MONTA_LINHA('</td>',vn_rel);
 
     MONTA_LINHA('<td',vn_rel);
-    MONTA_LINHA('style="vertical-align: top; width: 400px; background-color: #0088ff; font-weight: bold; text-align: center;">Valor da Eliminaï¿½ï¿½o<br>',vn_rel);
+    MONTA_LINHA('style="vertical-align: top; width: 400px; background-color: #0088ff; font-weight: bold; text-align: center;">Valor da Eliminação<br>',vn_rel);
     MONTA_LINHA('</td>',vn_rel);
 
     MONTA_LINHA('<td',vn_rel);
-    MONTA_LINHA('style="vertical-align: top; width: 400px; background-color: #0088ff; font-weight: bold; text-align: center;">Indicador da Eliminaï¿½ï¿½o<br>',vn_rel);
-    MONTA_LINHA('</td>',vn_rel);
-    
-    MONTA_LINHA('<td',vn_rel);
-    MONTA_LINHA('style="vertical-align: top; width: 400px; background-color: #0088ff; font-weight: bold; text-align: center;">Utiliza saldo final<br>',vn_rel);
+    MONTA_LINHA('style="vertical-align: top; width: 400px; background-color: #0088ff; font-weight: bold; text-align: center;">Indicador da Eliminação<br>',vn_rel);
     MONTA_LINHA('</td>',vn_rel);
 
     MONTA_LINHA('</tr>',vn_rel);
@@ -842,8 +830,7 @@ procedure dados_relatorio (vs_cod_empresa_cons     VARCHAR2
                           ,vs_AnoCompet        varchar2
                           ,vs_VlrElimin        varchar2
                           ,vs_IndElimin        varchar2
-                          ,vn_rel              number
-                          ,vs_utiliza_saldo    varchar2) is
+                          ,vn_rel              number) is
 
 
 wDscEmpresa_cons   varchar2(100) :=null;
@@ -949,9 +936,6 @@ begin
     MONTA_LINHA('<td style="vertical-align: top; width: 300px; text-align: center; font-weight: bold; font-size: 14px;">'||vs_IndElimin||'<br>',vn_rel);
     MONTA_LINHA('</td>',vn_rel);
 
-    MONTA_LINHA('<td style="vertical-align: top; width: 300px; text-align: center; font-weight: bold; font-size: 14px;">'||vs_utiliza_saldo||'<br>',vn_rel);
-    MONTA_LINHA('</td>',vn_rel);
-    
     MONTA_LINHA('</tr>',vn_rel);
 
 end;

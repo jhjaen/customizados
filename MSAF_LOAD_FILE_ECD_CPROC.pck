@@ -2,15 +2,15 @@ CREATE OR REPLACE PACKAGE MSAF_LOAD_FILE_ECD_CPROC IS
 
   --###########################################################################
   --## Autor    : Diego  Peres                                               ##
-  --## Criaï¿½?o  : 25/05/2020                                                 ##
+  --## Criaç?o  : 25/05/2020                                                 ##
   --## Empresa  : ATVI Consultoria                                           ##
-  --## Objetivo : PARAMETRO PARA GERAï¿½ï¿½O DO BLOCO K - ECD                    ##
+  --## Objetivo : PARAMETRO PARA GERAÇÃO DO BLOCO K - ECD                    ##
   --## Ajustes  :                                                            ##
   --##            001 - Felipe Guimaraes 17/04/2021                          ##
   --##            Permitir carga dos saldos atraves do registro K300         ##
   --###########################################################################
 
-  /* Declaraï¿½?o de Variï¿½veis Pï¿½blicas */
+  /* Declaraç?o de Variáveis Públicas */
   vNome  estabelecimento.razao_social%TYPE;
 
   FUNCTION Parametros RETURN         VARCHAR2;
@@ -21,11 +21,9 @@ CREATE OR REPLACE PACKAGE MSAF_LOAD_FILE_ECD_CPROC IS
   FUNCTION Modulo RETURN             VARCHAR2;
   FUNCTION Classificacao RETURN      VARCHAR2;
 
-  FUNCTION Executar(pRegistro         VARCHAR2, -- 1= I155 + I355, 2= K300
+  FUNCTION Executar(pRegistro         VARCHAR2,
                     pDirectory        Varchar2,
-                    pFiles            lib_proc.varTab,
-                    pNUtilEnc          varchar2,
-                    pContaX02         varchar2
+                    pFiles            lib_proc.varTab
                     ) RETURN INTEGER;
 
   PROCEDURE MONTA_LINHA (PS_LINHA IN VARCHAR2, vn_rel number);
@@ -48,9 +46,9 @@ CREATE OR REPLACE PACKAGE BODY MSAF_LOAD_FILE_ECD_CPROC IS
 
   --###########################################################################
   --## Autor    : Diego  Peres                                               ##
-  --## Criaï¿½?o  : 25/05/2020                                                 ##
+  --## Criaç?o  : 25/05/2020                                                 ##
   --## Empresa  : ATVI Consultoria                                           ##
-  --## Objetivo : PARAMETRO PARA GERAï¿½ï¿½O DO BLOCO K - ECD                    ##
+  --## Objetivo : PARAMETRO PARA GERAÇÃO DO BLOCO K - ECD                    ##
   --## Ajustes  :                                                            ##
   --##            001 - Felipe Guimaraes 17/04/2021                          ##
   --##            Permitir carga dos saldos atraves do registro K300         ##
@@ -142,7 +140,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_LOAD_FILE_ECD_CPROC IS
                        pmandatorio => 'S',
                        pdefault    => '1',
                        pmascara    => NULL,
-                       pvalores    => '1=Registro I155 + I355 (Saldos periï¿½dicos),2=Registro K300 (Saldo das contas consolidadas)',
+                       pvalores    => '1=Registro I155 + I355 (Saldos periódicos),2=Registro K300 (Saldo das contas consolidadas)',
                        papresenta  => 'S',
                        phabilita   => 'S');
 
@@ -160,7 +158,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_LOAD_FILE_ECD_CPROC IS
 
     --:4
     LIB_PROC.add_param(pstr,
-                       'Selecione o Diretï¿½rio',
+                       'Selecione o Diretório',
                        'Varchar2',
                        'Combobox',
                        'S',
@@ -207,7 +205,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_LOAD_FILE_ECD_CPROC IS
 
     -- :8
     LIB_PROC.ADD_PARAM(PPARAM      => PSTR,
-                       PTITULO     => '*** ATENï¿½ï¿½O: Selecione a origem de saldos (Registro K300) apenas para empresas que possuam saldos informados nesse registro.',
+                       PTITULO     => '*** ATENÇÃO: Selecione a origem de saldos (Registro K300) apenas para empresas que possuam saldos informados nesse registro.',
                        PTIPO       => 'varchar2',
                        PCONTROLE   => 'text',
                        PMANDATORIO => 'N',
@@ -232,7 +230,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_LOAD_FILE_ECD_CPROC IS
 
     --:10
     LIB_PROC.add_param(pstr,
-                       'Arquivos no Diretï¿½rio',
+                       'Arquivos no Diretório',
                        'Varchar2',
                        'MultiSelect',
                        'N',
@@ -240,42 +238,6 @@ CREATE OR REPLACE PACKAGE BODY MSAF_LOAD_FILE_ECD_CPROC IS
                        NULL,
                        'select x.file_name, x.file_name  from t_aux_files2 x where directory_name = :4'
                        );
-                       
-    -- :11
-    LIB_PROC.ADD_PARAM(PPARAM      => PSTR,
-                       PTITULO     => '',
-                       PTIPO       => 'varchar2',
-                       PCONTROLE   => 'text',
-                       PMANDATORIO => 'N',
-                       PDEFAULT    => NULL,
-                       PMASCARA    => NULL,
-                       PVALORES    => NULL,
-                       PAPRESENTA  => NULL,
-                       PHABILITA   => NULL);
-                       
-    -- :12
-    LIB_PROC.ADD_PARAM(PPARAM      => PSTR,
-                       PTITULO     => 'Utilizar saldo antes do encerramento',
-                       PTIPO       => 'varchar2',
-                       PCONTROLE   => 'checkbox',
-                       PMANDATORIO => 'N',
-                       PDEFAULT    => 'N',
-                       PMASCARA    => NULL,
-                       PVALORES    => NULL,
-                       PAPRESENTA  => 'S',
-                       PHABILITA   => 'S');
-                       
-    -- :13
-    LIB_PROC.ADD_PARAM(PPARAM      => PSTR,
-                       PTITULO     => 'Contas Contï¿½beis',
-                       PTIPO       => 'varchar2',
-                       PCONTROLE   => 'textbox',
-                       PMANDATORIO => 'S',
-                       PDEFAULT    => 'Digite as contas separadas por vï¿½rgula',
-                       PMASCARA    => NULL,
-                       PVALORES    => NULL,
-                       PAPRESENTA  => 'S',
-                       PHABILITA   => ':12 = ''S''');
 
 -- 001 Fim
 
@@ -315,12 +277,10 @@ CREATE OR REPLACE PACKAGE BODY MSAF_LOAD_FILE_ECD_CPROC IS
 
   FUNCTION Executar(pRegistro         VARCHAR2, -- 1= I155 + I355, 2= K300
                     pDirectory        Varchar2,
-                    pFiles            lib_proc.varTab,
-                    pNUtilEnc         varchar2,
-                    pContaX02         varchar2
+                    pFiles            lib_proc.varTab
                     ) RETURN INTEGER IS
 
-    -- Variaveis de Trabalho */
+    /* Variaveis de Trabalho */
     mproc_id          INTEGER;
     vn_rel            number:=1;
     vs_nome_interface varchar2(300);
@@ -328,17 +288,14 @@ CREATE OR REPLACE PACKAGE BODY MSAF_LOAD_FILE_ECD_CPROC IS
     vs_processo       varchar2(100);
     vs_msg            varchar2(200):=null;
 
-    --v_finalizar       number := 0;
+    v_finalizar       number := 0;
 
-    --Status_w         INTEGER;
-    --RazaoEst_w       ESTABELECIMENTO.RAZAO_SOCIAL%TYPE;
-    --CGC_w            ESTABELECIMENTO.CGC%TYPE;
+    Status_w         INTEGER;
+    RazaoEst_w       ESTABELECIMENTO.RAZAO_SOCIAL%TYPE;
+    CGC_w            ESTABELECIMENTO.CGC%TYPE;
     linha_log       varchar2(100);
 
-    --Finalizar EXCEPTION;
-    
-    vs_ind_saldo_fim varchar2(1);
-    vs_saldo_fim     varchar2(19);
+    Finalizar EXCEPTION;
 
 
   BEGIN
@@ -351,9 +308,9 @@ CREATE OR REPLACE PACKAGE BODY MSAF_LOAD_FILE_ECD_CPROC IS
         --    Mcod_Empresa := Pcod_empresa; --Lib_Parametros.Recuperar('EMPRESA');
 
 
-    /**************************************************
-     Inclui Header/Footer do Log de Erros            
-    **************************************************/
+    /***************************************************/
+    /* Inclui Header/Footer do Log de Erros            */
+    /***************************************************/
     linha_log := 'Log de Processo: '||mproc_id;
     lib_proc.Add_Log('.                                                                                                        '||linha_log, 0);
 
@@ -361,15 +318,15 @@ CREATE OR REPLACE PACKAGE BODY MSAF_LOAD_FILE_ECD_CPROC IS
     lib_proc.Add_Log(rpad('-', 200, '-'), 0);
     lib_proc.Add_Log(' ', 0);
 
-    /**************************************************************
-     Validaï¿½ï¿½o de datas inicial e final informadas com parï¿½metro 
-    **************************************************************/
+    /***************************************************************/
+    /* Validação de datas inicial e final informadas com parâmetro */
+    /***************************************************************/
 
 --    end if;
     LIB_PROC.add_tipo(mproc_id, vn_rel, 'ECD_BLOCOK', 3,48,150, '8', 'Relatorio');
 
     vs_nome_rel := 'Bloco K - ECD';
-    vs_nome_interface := 'Importaï¿½ï¿½o de Saldos do arquivo ECD';
+    vs_nome_interface := 'Importação de Saldos do arquivo ECD';
 
 
              LIB_PROC.add_log('PARAMETRO INCLUIDO COM SUCESSO', 1);
@@ -388,71 +345,23 @@ CREATE OR REPLACE PACKAGE BODY MSAF_LOAD_FILE_ECD_CPROC IS
                 MONTA_LINHA('style="vertical-align: top; font-weight: bold; text-align: center; color: #85929E; font-size: 16px;"> '||vs_msg || '<br>',vn_rel);
                 MONTA_LINHA('</td>',vn_rel);
 
-                begin
-                  execute immediate 'truncate table treg_plano_contas_ecd';
-                  exception
-                    when others then
-                      lib_proc.add_log('Falha ao truncar tabela treg_plano_contas_ecd: '||SQLERRM,1);
-                end;
+
+               execute immediate 'truncate table treg_plano_contas_ecd';
 
               for i IN pFiles.FIRST..pFiles.LAST loop
                  -- chamar procedure
                  PRC_LOAD_TXT_ECD(pDirectory, pFiles(i), v_qtde_reg, pRegistro);
-                 
-                 --utilizar saldo ecd ?
-                 if
-                   pNUtilEnc = 'S' THEN 
-                    FOR CONTAS IN (SELECT REGEXP_SUBSTR(STR, EXP, 1, LEVEL) ITEM
-                                            FROM (SELECT pContaX02 STR, '[^,]+' EXP FROM DUAL)
-                                          CONNECT BY REGEXP_SUBSTR(STR, EXP, 1, LEVEL) IS NOT NULL)
-                      LOOP
-
-
-                      begin
-                      
-                        select d.ind_dc_fim
-                               , d.vlr_saldo_fim
-                               into
-                               vs_ind_saldo_fim
-                               , vs_saldo_fim
-                             
-                             from treg_saldo_ecd d
-                             where 1=1
-                             and   d.cod_conta = contas.item
-                             and   upper(d.arquivo) = upper(pFiles(i))
-                             and   nvl(trim(d.registro),'x') = 'I355';
-                      
-                        exception
-                          when others then
-                            --lib_proc.add_log('Erro ao buscar saldo I355, motivo: '||sqlerrm||' - '||dbms_utility.format_error_backtrace,1);
-                            lib_proc.add_log('Erro ao localizar saldo no I355 para a conta contï¿½bil: '||contas.item,1);
-                            --lib_proc.add_log('Arquivo da ECD: '||upper(pFiles(i)),1);
-                            lib_proc.add_log('',1);
-                      end;
-                      
-                      update treg_saldo_ecd x
-                             set x.ind_dc_fim = vs_ind_saldo_fim
-                                 , x.vlr_saldo_fim = vs_saldo_fim
-                             where 1=1
-                             and   x.cod_conta = contas.item
-                             and   upper(x.arquivo) = upper(pFiles(i))
-                             and   nvl(trim(x.registro),'x') <> 'I355'
-                             and   to_char(to_date(x.periodo),'mm') = '12';
-                    END LOOP;
-                      
-                END IF;
 
                  dados_relatorio(pFiles(i), v_qtde_reg, vn_rel);
 
                  LIB_PROC.add_log('Arquivo: ' || pFiles(i) || ' -  Qtde Registros: ' || v_qtde_reg, 1);
 
               end loop;
-              commit;
 
               final_html(vn_rel);
 
 
-              -- processo de inserï¿½ï¿½o na tabela X2002
+              -- processo de inserção na tabela X2002
 
               -- recuperacao do grupo de cadastros e data do plano de contas
               BEGIN
@@ -509,7 +418,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_LOAD_FILE_ECD_CPROC IS
                 end;
 
 
-                -- Se nï¿½o encontrou na tabela X2002, faz o processo de inserï¿½ï¿½o
+                -- Se não encontrou na tabela X2002, faz o processo de inserção
                 if v_achou = 0 then
 
                    /*begin
@@ -531,7 +440,7 @@ CREATE OR REPLACE PACKAGE BODY MSAF_LOAD_FILE_ECD_CPROC IS
                    t_x2002.ind_conta    := 'A';
                    t_x2002.ind_situacao := 'A';
                    t_x2002.ind_conta_consolid := 'S';
-                   t_x2002.desc_detalhada := 'Inserida pela importaï¿½ï¿½o do Processo Customizado - Bloco K';
+                   t_x2002.desc_detalhada := 'Inserida pela importação do Processo Customizado - Bloco K';
 
 
                    -- inserindo na X2002
@@ -539,10 +448,10 @@ CREATE OR REPLACE PACKAGE BODY MSAF_LOAD_FILE_ECD_CPROC IS
                      insert into x2002_plano_contas values t_x2002;
                    exception
                      when others then
-                       LIB_PROC.add_log('Nï¿½o foi possï¿½vel inserir a conta ' || t_x2002.cod_conta || ' - ' || sqlerrm, 0);
+                       LIB_PROC.add_log('Não foi possível inserir a conta ' || t_x2002.cod_conta || ' - ' || sqlerrm, 0);
                   end;
 
-                  -- jï¿½ faz o commit para nï¿½o prejudicar a busca das contas existentes
+                  -- já faz o commit para não prejudicar a busca das contas existentes
                   if sql%rowcount > 0 then
                      commit;
                   end if;
@@ -551,16 +460,12 @@ CREATE OR REPLACE PACKAGE BODY MSAF_LOAD_FILE_ECD_CPROC IS
              end loop;
 
 
-              --LIB_PROC.add_log(mproc_id || '  Processo ', 1);
-              --LIB_PROC.CLOSE();
-              --RETURN mproc_id;
+              LIB_PROC.add_log(mproc_id || '  Processo ', 1);
+              LIB_PROC.CLOSE();
+
+        RETURN mproc_id;
 
         END;
-
-      LIB_PROC.add_log(mproc_id || '  Processo ', 1);
-      LIB_PROC.CLOSE();
-      RETURN mproc_id;
-
     END;
 
 
@@ -583,7 +488,7 @@ procedure cabecalho(ps_nome_rel            varchar2
     MONTA_LINHA('<head>',vn_rel);
     MONTA_LINHA('<meta content="text/html; charset=ISO-8859-1"',vn_rel);
     MONTA_LINHA('http-equiv="content-type">',vn_rel);
-    MONTA_LINHA('<title>Relatï¿½rio de execuï¿½ï¿½o</title>',vn_rel);
+    MONTA_LINHA('<title>Relatório de execução</title>',vn_rel);
     MONTA_LINHA('</head>',vn_rel);
     MONTA_LINHA('<body>',vn_rel);
     MONTA_LINHA('<span style="text-decoration: underline;"></span>',vn_rel);
@@ -612,7 +517,7 @@ procedure cabecalho(ps_nome_rel            varchar2
 
     MONTA_LINHA('<tr>',vn_rel);
     MONTA_LINHA('<td colspan="2" rowspan="1"',vn_rel);
-    MONTA_LINHA('style="vertical-align: top; width: 400px; font-weight: bold; color: green; font-size: 15px;">Diretï¿½rio: '||vn_diretorio||'<br>',vn_rel);
+    MONTA_LINHA('style="vertical-align: top; width: 400px; font-weight: bold; color: green; font-size: 15px;">Diretório: '||vn_diretorio||'<br>',vn_rel);
     MONTA_LINHA('</td>',vn_rel);
 
     MONTA_LINHA('</tr>',vn_rel);
